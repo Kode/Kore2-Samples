@@ -6,6 +6,7 @@ struct vertex_out {
 	pos: float4;
 }
 
+#[set(everything)]
 const constants: {
 	mvp: float4x4;
 };
