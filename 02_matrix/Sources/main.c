@@ -19,6 +19,7 @@ static kope_g5_command_list list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_buffer constants;
+static everything_set everything;
 
 float vec4_length(kinc_vector3_t a) {
 	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
@@ -110,9 +111,6 @@ static void update(void *data) {
 	constants_data->mvp = mvp;
 	constants_type_buffer_unlock(&constants);
 
-	everything descriptor_set;
-	descriptor_set.constants = &constants;
-
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
 	kope_g5_render_pass_parameters parameters = {0};
@@ -132,7 +130,7 @@ static void update(void *data) {
 
 	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
 
-	kong_set_descriptor_set_everything(&list, &descriptor_set);
+	kong_set_descriptor_set_everything(&list, &everything);
 
 	kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
 
@@ -171,19 +169,27 @@ int kickstart(int argc, char **argv) {
 
 	kong_vertex_in_buffer_unlock(&vertices);
 
-	kope_g5_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
-	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
-	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
-		kope_g5_buffer_unlock(&indices);
+		kope_g5_buffer_parameters params;
+		params.size = 3 * sizeof(uint16_t);
+		params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+		kope_g5_device_create_buffer(&device, &params, &indices);
+		{
+			uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
+			i[0] = 0;
+			i[1] = 1;
+			i[2] = 2;
+			kope_g5_buffer_unlock(&indices);
+		}
 	}
 
 	constants_type_buffer_create(&device, &constants);
+
+	{
+		everything_parameters parameters;
+		parameters.constants = &constants;
+		kong_create_everything_set(&device, &parameters, &everything);
+	}
 
 	kinc_start();
 
