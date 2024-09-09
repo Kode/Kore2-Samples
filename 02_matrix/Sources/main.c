@@ -116,9 +116,9 @@ static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
-	clear_color.r = 0.25f;
+	clear_color.r = 0.0f;
 	clear_color.g = 0.0f;
-	clear_color.b = 0.0f;
+	clear_color.b = 0.25f;
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
 	parameters.color_attachments[0].texture = framebuffer;
