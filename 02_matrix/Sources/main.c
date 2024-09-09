@@ -1,8 +1,3 @@
-#include <kinc/graphics4/graphics.h>
-#include <kinc/graphics4/indexbuffer.h>
-#include <kinc/graphics4/pipeline.h>
-#include <kinc/graphics4/shader.h>
-#include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/io/filereader.h>
 #include <kinc/log.h>
 #include <kinc/system.h>

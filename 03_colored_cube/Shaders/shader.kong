@@ -8,6 +8,7 @@ struct vertex_out {
 	col: float3;
 }
 
+#[set(everything)]
 const constants: {
 	mvp: float4x4;
 };
@@ -38,5 +39,5 @@ struct pipeline {
 	vertex = pos;
 	fragment = pix;
 	depth_write = true;
-	depth_mode = COMPARE_LESS;
+	depth_compare = COMPARE_LESS;
 }

@@ -1,9 +1,6 @@
 #include <kinc/graphics4/constantbuffer.h>
 #include <kinc/graphics4/graphics.h>
 #include <kinc/graphics4/indexbuffer.h>
-#include <kinc/graphics4/pipeline.h>
-#include <kinc/graphics4/shader.h>
-#include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/io/filereader.h>
 #include <kinc/log.h>
 #include <kinc/system.h>
@@ -16,13 +13,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static constants_type_buffer constants;
+static kope_g5_device device;
+static kope_g5_command_list list;
+static vertex_in_buffer vertices;
+static kope_g5_buffer indices;
+static kope_g5_buffer constants;
+static everything_set everything;
 
-#define HEAP_SIZE 1024 * 1024
-static uint8_t *heap = NULL;
-static size_t heap_top = 0;
+static uint32_t vertex_count;
 
 /* clang-format off */
 static float vertices_data[] = {
@@ -103,13 +101,6 @@ static float colors_data[] = {
 	0.982f,  0.099f,  0.879f
 };
 /* clang-format on */
-
-static void *allocate(size_t size) {
-	size_t old_top = heap_top;
-	heap_top += size;
-	assert(heap_top <= HEAP_SIZE);
-	return &heap[old_top];
-}
 
 float vec4_length(kinc_vector3_t a) {
 	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
@@ -201,30 +192,52 @@ static void update(void *data) {
 	constants_data->mvp = mvp;
 	constants_type_buffer_unlock(&constants);
 
-	kinc_g4_begin(0);
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR | KINC_G4_CLEAR_DEPTH, 0xff000044, 1.0f, 0);
-	kinc_g4_set_pipeline(&pipeline);
-	constants_type_buffer_set(&constants);
-	kinc_g4_set_vertex_buffer(&vertices);
-	kinc_g4_set_index_buffer(&indices);
-	kinc_g4_draw_indexed_vertices();
+	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
-	kinc_g4_end(0);
-	kinc_g4_swap_buffers();
+	kope_g5_render_pass_parameters parameters = {0};
+	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+	kope_g5_color clear_color;
+	clear_color.r = 0.0f;
+	clear_color.g = 0.0f;
+	clear_color.b = 0.25f;
+	clear_color.a = 1.0f;
+	parameters.color_attachments[0].clear_value = clear_color;
+	parameters.color_attachments[0].texture = framebuffer;
+	kope_g5_command_list_begin_render_pass(&list, &parameters);
+
+	kong_set_pipeline(&list, &pipeline);
+
+	kong_set_vertex_buffer_vertex_in(&list, &vertices);
+
+	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+
+	kong_set_descriptor_set_everything(&list, &everything);
+
+	kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+
+	kope_g5_command_list_end_render_pass(&list);
+
+	kope_g5_command_list_present(&list);
+
+	kope_g5_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
 	kinc_init("Example", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
-	heap = (uint8_t *)malloc(HEAP_SIZE);
-	assert(heap != NULL);
+	kope_g5_device_wishlist wishlist = {0};
+	kope_g5_device_create(&device, &wishlist);
 
-	int vertex_count = sizeof(vertices_data) / 3 / 4;
-	kinc_g4_vertex_buffer_init(&vertices, vertex_count, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
+	kong_init(&device);
+
+	kope_g5_device_create_command_list(&device, &list);
+
+	vertex_count = sizeof(vertices_data) / 3 / 4;
+	kong_create_buffer_vertex_in(&device, vertex_count, &vertices);
 	{
-		vertex_in *v = (vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices);
-		for (int i = 0; i < vertex_count; ++i) {
+		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
+		for (uint32_t i = 0; i < vertex_count; ++i) {
 			v[i].pos.x = vertices_data[i * 3];
 			v[i].pos.y = vertices_data[i * 3 + 1];
 			v[i].pos.z = vertices_data[i * 3 + 2];
@@ -232,19 +245,28 @@ int kickstart(int argc, char **argv) {
 			v[i].col.y = colors_data[i * 3 + 1];
 			v[i].col.z = colors_data[i * 3 + 2];
 		}
-		kinc_g4_vertex_buffer_unlock_all(&vertices);
+		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
-	kinc_g4_index_buffer_init(&indices, vertex_count, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
+	kope_g5_buffer_parameters params;
+	params.size = vertex_count * sizeof(uint16_t);
+	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *id = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices);
-		for (int i = 0; i < vertex_count; ++i) {
+		uint16_t *id = (uint16_t *)kope_g5_buffer_lock(&indices);
+		for (uint32_t i = 0; i < vertex_count; ++i) {
 			id[i] = i;
 		}
-		kinc_g4_index_buffer_unlock_all(&indices);
+		kope_g5_buffer_unlock(&indices);
 	}
 
-	constants_type_buffer_init(&constants);
+	constants_type_buffer_create(&device, &constants);
+
+	{
+		everything_parameters parameters;
+		parameters.constants = &constants;
+		kong_create_everything_set(&device, &parameters, &everything);
+	}
 
 	kinc_start();
 
