@@ -209,11 +209,11 @@ static void update(void *data) {
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
-	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, vertex_count * sizeof(uint16_t));
 
 	kong_set_descriptor_set_everything(&list, &everything);
 
-	kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+	kope_g5_command_list_draw_indexed(&list, vertex_count, 1, 0, 0, 0);
 
 	kope_g5_command_list_end_render_pass(&list);
 
