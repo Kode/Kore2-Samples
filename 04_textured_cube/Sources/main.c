@@ -246,7 +246,8 @@ int kickstart(int argc, char **argv) {
 	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
 	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
 
-	kope_g5_device_create_sampler(NULL);
+	kope_g5_sampler_parameters sampler_parameters;
+	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
 	kope_g5_device_create_command_list(&device, &list);
 
