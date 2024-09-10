@@ -8,6 +8,7 @@ struct vertex_out {
 	tex: float2;
 }
 
+#[set(everything)]
 const constants: {
 	mvp: float4x4;
 };
@@ -26,7 +27,10 @@ fun pos(input: vertex_in): vertex_out {
 	return output;
 }
 
+#[set(everything)]
 const pix_texture: tex2d;
+
+#[set(everything)]
 const pix_sampler: sampler;
 
 fun pix(input: vertex_out): float4 {

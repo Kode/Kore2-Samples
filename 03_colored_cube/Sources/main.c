@@ -1,6 +1,3 @@
-#include <kinc/graphics4/constantbuffer.h>
-#include <kinc/graphics4/graphics.h>
-#include <kinc/graphics4/indexbuffer.h>
 #include <kinc/io/filereader.h>
 #include <kinc/log.h>
 #include <kinc/system.h>
