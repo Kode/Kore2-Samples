@@ -19,6 +19,7 @@ static kope_g5_buffer constants;
 static kope_g5_texture texture;
 static kope_g5_sampler sampler;
 static everything_set everything;
+static kope_g5_buffer image_buffer;
 
 static uint32_t vertex_count;
 
@@ -176,6 +177,8 @@ kinc_matrix4x4_t matrix4x4_identity(void) {
 	return m;
 }
 
+static bool first_update = true;
+
 static void update(void *data) {
 	kinc_matrix4x4_t projection = matrix4x4_perspective_projection(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
 	kinc_vector3_t v0 = {4, 3, 3};
@@ -191,6 +194,15 @@ static void update(void *data) {
 	constants_type *constants_data = constants_type_buffer_lock(&constants);
 	constants_data->mvp = mvp;
 	constants_type_buffer_unlock(&constants);
+
+	if (first_update) {
+		kope_uint3 size;
+		size.x = 512;
+		size.y = 512;
+		size.z = 1;
+		kope_g5_command_list_copy_buffer_to_texture(&list, &image_buffer, &texture, size);
+		first_update = false;
+	}
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
@@ -231,7 +243,6 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
-	kope_g5_buffer image_buffer;
 	kope_g5_buffer_parameters buffer_parameters;
 	buffer_parameters.size = 512 * 512 * 4;
 	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
@@ -243,10 +254,27 @@ int kickstart(int argc, char **argv) {
 	kope_g5_buffer_unlock(&image_buffer);
 
 	kope_g5_texture_parameters texture_parameters;
+	texture_parameters.width = 512;
+	texture_parameters.height = 512;
+	texture_parameters.depth_or_array_layers = 1;
+	texture_parameters.mip_level_count = 1;
+	texture_parameters.sample_count = 1;
 	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST;
 	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
 
 	kope_g5_sampler_parameters sampler_parameters;
+	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
+	sampler_parameters.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
+	sampler_parameters.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;
+	sampler_parameters.mag_filter = KOPE_G5_FILTER_MODE_LINEAR;
+	sampler_parameters.min_filter = KOPE_G5_FILTER_MODE_LINEAR;
+	sampler_parameters.mipmap_filter = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
+	sampler_parameters.lod_min_clamp = 1;
+	sampler_parameters.lod_max_clamp = 32;
+	sampler_parameters.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
+	sampler_parameters.max_anisotropy = 1;
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
 	kope_g5_device_create_command_list(&device, &list);
