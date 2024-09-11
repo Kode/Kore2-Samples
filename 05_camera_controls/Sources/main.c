@@ -1,9 +1,4 @@
-#include <kinc/graphics4/graphics.h>
-#include <kinc/graphics4/indexbuffer.h>
-#include <kinc/graphics4/pipeline.h>
-#include <kinc/graphics4/shader.h>
-#include <kinc/graphics4/texture.h>
-#include <kinc/graphics4/vertexbuffer.h>
+#include <kinc/image.h>
 #include <kinc/input/keyboard.h>
 #include <kinc/input/mouse.h>
 #include <kinc/io/filereader.h>
@@ -18,14 +13,17 @@
 #include <stdlib.h>
 #include <string.h>
 
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static kinc_g4_texture_t texture;
-static constants_type_buffer constants;
+static kope_g5_device device;
+static kope_g5_command_list list;
+static vertex_in_buffer vertices;
+static kope_g5_buffer indices;
+static kope_g5_buffer constants;
+static kope_g5_texture texture;
+static kope_g5_sampler sampler;
+static everything_set everything;
+static kope_g5_buffer image_buffer;
 
-#define HEAP_SIZE 1024 * 1024 * 2
-static uint8_t *heap = NULL;
-static size_t heap_top = 0;
+static uint32_t vertex_count;
 
 float last_time = 0.0;
 kinc_vector3_t position = {0, 0, 5};
@@ -120,13 +118,6 @@ static float tex_data[] = {
 	0.667979f, 0.335851f
 };
 /* clang-format on */
-
-static void *allocate(size_t size) {
-	size_t old_top = heap_top;
-	heap_top += size;
-	assert(heap_top <= HEAP_SIZE);
-	return &heap[old_top];
-}
 
 float vec4_length(kinc_vector3_t a) {
 	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
@@ -239,6 +230,8 @@ void mouse_up(int window, int button, int x, int y, void *data) {
 	is_mouse_down = false;
 }
 
+static bool first_update = true;
+
 static void update(void *data) {
 	float delta_time = (float)kinc_time() - last_time;
 	last_time = (float)kinc_time();
@@ -294,17 +287,43 @@ static void update(void *data) {
 	constants_data->mvp = mvp;
 	constants_type_buffer_unlock(&constants);
 
-	kinc_g4_begin(0);
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR | KINC_G4_CLEAR_DEPTH, 0xff000044, 1.0f, 0);
-	kinc_g4_set_pipeline(&pipeline);
-	constants_type_buffer_set(&constants);
-	kinc_g4_set_texture(pix_texture, &texture);
-	kinc_g4_set_vertex_buffer(&vertices);
-	kinc_g4_set_index_buffer(&indices);
-	kinc_g4_draw_indexed_vertices();
+	if (first_update) {
+		kope_uint3 size;
+		size.x = 512;
+		size.y = 512;
+		size.z = 1;
+		kope_g5_command_list_copy_buffer_to_texture(&list, &image_buffer, &texture, size);
+		first_update = false;
+	}
 
-	kinc_g4_end(0);
-	kinc_g4_swap_buffers();
+	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
+
+	kope_g5_render_pass_parameters parameters = {0};
+	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+	kope_g5_color clear_color;
+	clear_color.r = 0.0f;
+	clear_color.g = 0.0f;
+	clear_color.b = 0.25f;
+	clear_color.a = 1.0f;
+	parameters.color_attachments[0].clear_value = clear_color;
+	parameters.color_attachments[0].texture = framebuffer;
+	kope_g5_command_list_begin_render_pass(&list, &parameters);
+
+	kong_set_pipeline(&list, &pipeline);
+
+	kong_set_vertex_buffer_vertex_in(&list, &vertices);
+
+	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, vertex_count * sizeof(uint16_t));
+
+	kong_set_descriptor_set_everything(&list, &everything);
+
+	kope_g5_command_list_draw_indexed(&list, vertex_count, 1, 0, 0, 0);
+
+	kope_g5_command_list_end_render_pass(&list);
+
+	kope_g5_command_list_present(&list);
+
+	kope_g5_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
@@ -316,42 +335,82 @@ int kickstart(int argc, char **argv) {
 	kinc_mouse_set_press_callback(mouse_down, NULL);
 	kinc_mouse_set_release_callback(mouse_up, NULL);
 
-	heap = (uint8_t *)malloc(HEAP_SIZE);
-	assert(heap != NULL);
+	kope_g5_device_wishlist wishlist = {0};
+	kope_g5_device_create(&device, &wishlist);
+
+	kong_init(&device);
+
+	kope_g5_buffer_parameters buffer_parameters;
+	buffer_parameters.size = 512 * 512 * 4;
+	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+	kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
 	kinc_image_t image;
-	void *image_mem = allocate(512 * 512 * 4);
-	kinc_image_init_from_file(&image, image_mem, "uvtemplate.png");
-	kinc_g4_texture_init_from_image(&texture, &image);
+	kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer), "uvtemplate.png");
 	kinc_image_destroy(&image);
+	kope_g5_buffer_unlock(&image_buffer);
 
-	// pipeline.depth_write = true;
-	// pipeline.depth_mode = KINC_G4_COMPARE_LESS;
+	kope_g5_texture_parameters texture_parameters;
+	texture_parameters.width = 512;
+	texture_parameters.height = 512;
+	texture_parameters.depth_or_array_layers = 1;
+	texture_parameters.mip_level_count = 1;
+	texture_parameters.sample_count = 1;
+	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST;
+	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
 
-	int vertex_count = sizeof(vertices_data) / 3 / 4;
-	kinc_g4_vertex_buffer_init(&vertices, vertex_count, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
+	kope_g5_sampler_parameters sampler_parameters;
+	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
+	sampler_parameters.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
+	sampler_parameters.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;
+	sampler_parameters.mag_filter = KOPE_G5_FILTER_MODE_LINEAR;
+	sampler_parameters.min_filter = KOPE_G5_FILTER_MODE_LINEAR;
+	sampler_parameters.mipmap_filter = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
+	sampler_parameters.lod_min_clamp = 1;
+	sampler_parameters.lod_max_clamp = 32;
+	sampler_parameters.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
+	sampler_parameters.max_anisotropy = 1;
+	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
+
+	kope_g5_device_create_command_list(&device, &list);
+
+	vertex_count = sizeof(vertices_data) / 3 / 4;
+	kong_create_buffer_vertex_in(&device, vertex_count, &vertices);
 	{
-		vertex_in *v = (vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices);
-		for (int i = 0; i < vertex_count; ++i) {
+		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
+		for (uint32_t i = 0; i < vertex_count; ++i) {
 			v[i].pos.x = vertices_data[i * 3];
 			v[i].pos.y = vertices_data[i * 3 + 1];
 			v[i].pos.z = vertices_data[i * 3 + 2];
 			v[i].tex.x = tex_data[i * 2];
 			v[i].tex.y = tex_data[i * 2 + 1];
 		}
-		kinc_g4_vertex_buffer_unlock_all(&vertices);
+		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
-	kinc_g4_index_buffer_init(&indices, vertex_count, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
+	kope_g5_buffer_parameters params;
+	params.size = vertex_count * sizeof(uint16_t);
+	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *id = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices);
-		for (int i = 0; i < vertex_count; ++i) {
+		uint16_t *id = (uint16_t *)kope_g5_buffer_lock(&indices);
+		for (uint32_t i = 0; i < vertex_count; ++i) {
 			id[i] = i;
 		}
-		kinc_g4_index_buffer_unlock_all(&indices);
+		kope_g5_buffer_unlock(&indices);
 	}
 
-	constants_type_buffer_init(&constants);
+	constants_type_buffer_create(&device, &constants);
+
+	{
+		everything_parameters parameters;
+		parameters.constants = &constants;
+		parameters.pix_texture = &texture;
+		parameters.pix_sampler = &sampler;
+		kong_create_everything_set(&device, &parameters, &everything);
+	}
 
 	kinc_start();
 
