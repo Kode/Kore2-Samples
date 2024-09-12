@@ -1,34 +1,26 @@
-#include <kinc/compute/compute.h>
-#include <kinc/graphics4/graphics.h>
-#include <kinc/graphics4/indexbuffer.h>
-#include <kinc/graphics4/pipeline.h>
-#include <kinc/graphics4/shader.h>
-#include <kinc/graphics4/texture.h>
-#include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/io/filereader.h>
 #include <kinc/math/matrix.h>
 #include <kinc/system.h>
 
+#include <kong.h>
+
 #include <assert.h>
 
-static kinc_g4_shader_t vertexShader;
-static kinc_g4_shader_t fragmentShader;
-static kinc_g4_pipeline_t pipeline;
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static kinc_g4_texture_t texture;
-static kinc_g4_texture_unit_t texunit;
-static kinc_g4_constant_location_t offset;
-static kinc_compute_shader_t computeShader;
-static kinc_compute_texture_unit_t computeTexunit;
-static kinc_compute_constant_location_t computeLocation;
+static kope_g5_device device;
+static kope_g5_command_list list;
+static vertex_in_buffer vertices;
+static kope_g5_buffer indices;
+static kope_g5_buffer constants;
+static kope_g5_texture texture;
+static kope_g5_sampler sampler;
+static everything_set everything;
+static kope_g5_buffer image_buffer;
 
 #define WIDTH 1024
 #define HEIGHT 768
-#define MAX_SHADER_SIZE 1024 * 1024 * 1024
 
 void update(void *data) {
-	kinc_g4_begin(0);
+	/*kinc_g4_begin(0);
 	kinc_g4_clear(KINC_G4_CLEAR_COLOR | KINC_G4_CLEAR_DEPTH, 0, 0.0f, 0);
 
 	kinc_compute_set_shader(&computeShader);
@@ -45,11 +37,11 @@ void update(void *data) {
 	kinc_g4_draw_indexed_vertices();
 
 	kinc_g4_end(0);
-	kinc_g4_swap_buffers();
+	kinc_g4_swap_buffers();*/
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Compute", WIDTH, HEIGHT, NULL, NULL);
+	/*kinc_init("Compute", WIDTH, HEIGHT, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kinc_g4_texture_init(&texture, 256, 256, KINC_IMAGE_FORMAT_RGBA128);
@@ -57,33 +49,33 @@ int kickstart(int argc, char **argv) {
 	void *shaderSource = malloc(MAX_SHADER_SIZE);
 
 	{
-		kinc_file_reader_t cs;
-		kinc_file_reader_open(&cs, "test.comp", KINC_FILE_TYPE_ASSET);
-		assert(kinc_file_reader_size(&cs) <= MAX_SHADER_SIZE);
-		kinc_file_reader_read(&cs, shaderSource, kinc_file_reader_size(&cs));
-		kinc_compute_shader_init(&computeShader, shaderSource, (int)kinc_file_reader_size(&cs));
-		kinc_file_reader_close(&cs);
+	    kinc_file_reader_t cs;
+	    kinc_file_reader_open(&cs, "test.comp", KINC_FILE_TYPE_ASSET);
+	    assert(kinc_file_reader_size(&cs) <= MAX_SHADER_SIZE);
+	    kinc_file_reader_read(&cs, shaderSource, kinc_file_reader_size(&cs));
+	    kinc_compute_shader_init(&computeShader, shaderSource, (int)kinc_file_reader_size(&cs));
+	    kinc_file_reader_close(&cs);
 	}
 
 	computeTexunit = kinc_compute_shader_get_texture_unit(&computeShader, "destTex");
 	computeLocation = kinc_compute_shader_get_constant_location(&computeShader, "roll");
 
 	{
-		kinc_file_reader_t vs;
-		kinc_file_reader_open(&vs, "shader.vert", KINC_FILE_TYPE_ASSET);
-		assert(kinc_file_reader_size(&vs) <= MAX_SHADER_SIZE);
-		kinc_file_reader_read(&vs, shaderSource, kinc_file_reader_size(&vs));
-		kinc_g4_shader_init(&vertexShader, shaderSource, kinc_file_reader_size(&vs), KINC_G4_SHADER_TYPE_VERTEX);
-		kinc_file_reader_close(&vs);
+	    kinc_file_reader_t vs;
+	    kinc_file_reader_open(&vs, "shader.vert", KINC_FILE_TYPE_ASSET);
+	    assert(kinc_file_reader_size(&vs) <= MAX_SHADER_SIZE);
+	    kinc_file_reader_read(&vs, shaderSource, kinc_file_reader_size(&vs));
+	    kinc_g4_shader_init(&vertexShader, shaderSource, kinc_file_reader_size(&vs), KINC_G4_SHADER_TYPE_VERTEX);
+	    kinc_file_reader_close(&vs);
 	}
 
 	{
-		kinc_file_reader_t fs;
-		kinc_file_reader_open(&fs, "shader.frag", KINC_FILE_TYPE_ASSET);
-		assert(kinc_file_reader_size(&fs) <= MAX_SHADER_SIZE);
-		kinc_file_reader_read(&fs, shaderSource, kinc_file_reader_size(&fs));
-		kinc_g4_shader_init(&fragmentShader, shaderSource, kinc_file_reader_size(&fs), KINC_G4_SHADER_TYPE_FRAGMENT);
-		kinc_file_reader_close(&fs);
+	    kinc_file_reader_t fs;
+	    kinc_file_reader_open(&fs, "shader.frag", KINC_FILE_TYPE_ASSET);
+	    assert(kinc_file_reader_size(&fs) <= MAX_SHADER_SIZE);
+	    kinc_file_reader_read(&fs, shaderSource, kinc_file_reader_size(&fs));
+	    kinc_g4_shader_init(&fragmentShader, shaderSource, kinc_file_reader_size(&fs), KINC_G4_SHADER_TYPE_FRAGMENT);
+	    kinc_file_reader_close(&fs);
 	}
 
 	kinc_g4_vertex_structure_t structure;
@@ -126,7 +118,7 @@ int kickstart(int argc, char **argv) {
 	i[2] = 2;
 	kinc_g4_index_buffer_unlock_all(&indices);
 
-	kinc_start();
+	kinc_start();*/
 
 	return 0;
 }
