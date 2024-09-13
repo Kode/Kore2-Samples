@@ -15,8 +15,6 @@ static kope_g5_buffer compute_constants;
 static kope_g5_texture texture;
 static kope_g5_sampler sampler;
 static everything_set everything;
-static compute_set compute;
-static kope_g5_buffer image_buffer;
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -27,15 +25,7 @@ void update(void *data) {
 	constants_data->mvp = matrix;
 	constants_type_buffer_unlock(&constants);
 
-	compute_constants_type *compute_constants_data = compute_constants_type_buffer_lock(&compute_constants);
-	compute_constants_data->roll = 0;
-	compute_constants_type_buffer_unlock(&compute_constants);
-
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
-
-	kong_set_compute_pipeline(&list, &comp);
-	kong_set_descriptor_set_compute(&list, &compute);
-	kope_g5_command_list_compute(&list, 256 / 16, 256 / 16, 1);
 
 	kope_g5_render_pass_parameters parameters = {0};
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
@@ -141,15 +131,6 @@ int kickstart(int argc, char **argv) {
 		parameters.comp_texture = &texture;
 		parameters.comp_sampler = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
-	}
-
-	compute_constants_type_buffer_create(&device, &compute_constants);
-
-	{
-		compute_parameters parameters;
-		parameters.compute_constants = &compute_constants;
-		parameters.dest_texture = &texture;
-		kong_create_compute_set(&device, &parameters, &compute);
 	}
 
 	kinc_start();
