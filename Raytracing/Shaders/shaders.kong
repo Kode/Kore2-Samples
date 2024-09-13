@@ -97,15 +97,15 @@ fun closesthit(payload: Payload, uv: float2): void {
     payload.color = float3(1, 0, 1);
 }
 
-fun intersect(): void {}
+//fun intersect(): void {}
 
-fun anyhit(payload: Payload, uv: float2): void {}
+//fun anyhit(payload: Payload, uv: float2): void {}
 
 #[raypipe]
 struct RayPipe {
     gen = sendrays;
     miss = raymissed;
     closest = closesthit;
-    intersection = intersect;
-    any = anyhit;
+    //intersection = intersect;
+    //any = anyhit;
 }
