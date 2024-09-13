@@ -1,4 +1,4 @@
-const project = new Project('Compute');
+const project = new Project('Raytracing');
 
 await project.addProject('../Kinc', {kong: true, kope: true});
 

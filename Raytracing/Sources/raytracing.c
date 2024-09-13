@@ -66,7 +66,7 @@ void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Compute", 1024, 768, NULL, NULL);
+	kinc_init("Raytracing", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
