@@ -52,9 +52,11 @@ struct Payload {
     missed: bool;
 }
 
+#[set(rayset)]
 const scene: bvh;
 
-#[write] const uav: tex2d;
+#[set(rayset), write]
+const uav: tex2d;
 
 const camera: float3 = float3(0, 1.5, -7);
 const light: float3 = float3(0, 200, 0);
