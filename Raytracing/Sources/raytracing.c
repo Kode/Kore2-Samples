@@ -5,6 +5,7 @@
 #include <kong.h>
 
 #include <assert.h>
+#include <string.h>
 
 static kope_g5_device device;
 static kope_g5_command_list list;
@@ -16,8 +17,21 @@ static kope_g5_texture texture;
 static kope_g5_sampler sampler;
 static everything_set everything;
 
+static float quadVtx[] = {-1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1};
+static float cubeVtx[] = {-1, -1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, 1, 1, 1};
+static uint16_t cubeIdx[] = {4, 6, 0, 2, 0, 6, 0, 1, 4, 5, 4, 1, 0, 2, 1, 3, 1, 2, 1, 3, 5, 7, 5, 3, 2, 6, 3, 7, 3, 6, 4, 5, 6, 7, 6, 5};
+
+static kope_g5_buffer quadVB;
+static kope_g5_buffer cubeVB;
+static kope_g5_buffer cubeIB;
+
+static kope_g5_raytracing_volume quadBlas;
+static kope_g5_raytracing_volume cubeBlas;
+
 #define WIDTH 1024
 #define HEIGHT 768
+
+static bool first = true;
 
 void update(void *data) {
 	constants_type *constants_data = constants_type_buffer_lock(&constants);
@@ -26,6 +40,13 @@ void update(void *data) {
 	constants_type_buffer_unlock(&constants);
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
+
+	if (first) {
+		first = false;
+
+		kope_g5_command_list_prepare_raytracing_volume(&list, &quadBlas);
+		kope_g5_command_list_prepare_raytracing_volume(&list, &cubeBlas);
+	}
 
 	kope_g5_render_pass_parameters parameters = {0};
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
@@ -89,6 +110,43 @@ int kickstart(int argc, char **argv) {
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
 	kope_g5_device_create_command_list(&device, &list);
+
+	{
+		kope_g5_buffer_parameters params;
+		params.size = sizeof(quadVtx);
+		params.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+		kope_g5_device_create_buffer(&device, &params, &quadVB);
+
+		void *data = kope_g5_buffer_lock(&quadVB);
+		memcpy(data, quadVtx, sizeof(quadVtx));
+		kope_g5_buffer_unlock(&quadVB);
+	}
+
+	kope_g5_device_create_raytracing_volume(&device, &quadVB, sizeof(quadVtx) / 4 / 3, NULL, 0, &quadBlas);
+
+	{
+		kope_g5_buffer_parameters params;
+		params.size = sizeof(cubeVtx);
+		params.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+		kope_g5_device_create_buffer(&device, &params, &cubeVB);
+
+		void *data = kope_g5_buffer_lock(&cubeVB);
+		memcpy(data, cubeVtx, sizeof(cubeVtx));
+		kope_g5_buffer_unlock(&cubeVB);
+	}
+
+	{
+		kope_g5_buffer_parameters params;
+		params.size = sizeof(cubeIdx);
+		params.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+		kope_g5_device_create_buffer(&device, &params, &cubeIB);
+
+		void *data = kope_g5_buffer_lock(&cubeIB);
+		memcpy(data, cubeIdx, sizeof(cubeIdx));
+		kope_g5_buffer_unlock(&cubeIB);
+	}
+
+	kope_g5_device_create_raytracing_volume(&device, &cubeVB, sizeof(cubeVtx) / 4 / 3, NULL, 0, &cubeBlas);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
