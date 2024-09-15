@@ -16,6 +16,7 @@ static kope_g5_buffer compute_constants;
 static kope_g5_texture texture;
 static kope_g5_sampler sampler;
 static everything_set everything;
+static rayset_set rayset;
 
 static float quadVtx[] = {-1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1};
 static float cubeVtx[] = {-1, -1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, 1, 1, 1};
@@ -25,8 +26,11 @@ static kope_g5_buffer quadVB;
 static kope_g5_buffer cubeVB;
 static kope_g5_buffer cubeIB;
 
-static kope_g5_raytracing_volume quadBlas;
 static kope_g5_raytracing_volume cubeBlas;
+static kope_g5_raytracing_volume quadBlas;
+
+static kope_g5_raytracing_hierarchy hierarchy;
+static kope_g5_texture render_target;
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -44,9 +48,16 @@ void update(void *data) {
 	if (first) {
 		first = false;
 
-		kope_g5_command_list_prepare_raytracing_volume(&list, &quadBlas);
 		kope_g5_command_list_prepare_raytracing_volume(&list, &cubeBlas);
+		kope_g5_command_list_prepare_raytracing_volume(&list, &quadBlas);
+		kope_g5_command_list_prepare_raytracing_hierarchy(&list, &hierarchy);
 	}
+
+	kong_set_ray_pipeline(&list, &RayPipe);
+
+	kong_set_descriptor_set_rayset(&list, &rayset);
+
+	kope_g5_command_list_trace_rays(&list);
 
 	kope_g5_render_pass_parameters parameters = {0};
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
@@ -148,6 +159,9 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_raytracing_volume(&device, &cubeVB, sizeof(cubeVtx) / 4 / 3, NULL, 0, &cubeBlas);
 
+	kope_g5_raytracing_volume *volumes[] = {&cubeBlas, &quadBlas, &quadBlas};
+	kope_g5_device_create_raytracing_hierarchy(&device, volumes, 3, &hierarchy);
+
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
 		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
@@ -189,6 +203,24 @@ int kickstart(int argc, char **argv) {
 		parameters.comp_texture = &texture;
 		parameters.comp_sampler = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
+	}
+
+	kope_g5_texture_parameters render_target_parameters;
+	render_target_parameters.width = 1024;
+	render_target_parameters.height = 768;
+	render_target_parameters.depth_or_array_layers = 1;
+	render_target_parameters.mip_level_count = 1;
+	render_target_parameters.sample_count = 1;
+	render_target_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+	render_target_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	render_target_parameters.usage = KONG_G5_TEXTURE_USAGE_READ_WRITE;
+	kope_g5_device_create_texture(&device, &render_target_parameters, &render_target);
+
+	{
+		rayset_parameters parameters;
+		parameters.scene = &hierarchy.d3d12.acceleration_structure;
+		parameters.uav = &render_target;
+		kong_create_rayset_set(&device, &parameters, &rayset);
 	}
 
 	kinc_start();
