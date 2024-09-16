@@ -49,8 +49,109 @@ fun raymissed(payload: ray_payload): void {
     payload.missed = true;
 }
 
+fun hit_cube(payload: ray_payload, uv: float2): void {
+    var tri: uint = primitive_index();
+
+    tri /= 2;
+    
+    var normal_x: float = 0.0;
+	if (tri % 3 == 0) {
+		if (tri < 3) {
+			normal_x = -1;
+		}
+		else {
+			normal_x = 1;
+		}
+	}
+
+	var normal_y: float = 0.0;
+	if (tri % 3 == 1) {
+		if (tri < 3) {
+			normal_y = -1;
+		}
+		else {
+			normal_y = 1;
+		}
+	}
+
+	var normal_z: float = 0.0;
+	if (tri % 3 == 2) {
+		if (tri < 3) {
+			normal_z = -1;
+		}
+		else {
+			normal_z = 1;
+		}
+	}
+
+	var normal: float3 = float3(normal_x, normal_y, normal_z);
+
+    var worldNormal: float3 = normalize(object_to_world3x3() * normal);
+
+    var color: float3 = abs(normal) / 3.0 + 0.5;
+    if (uv.x < 0.03 || uv.y < 0.03) {
+        color = float3(0.25, 0.25, 0.25);
+    }
+
+    color *= saturate3(dot(worldNormal, normalize(light))) + 0.33;
+    payload.color = color;
+}
+
+fun hit_mirror(payload: ray_payload, uv: float2): void {
+    if (payload.allow_reflection) {
+		var pos: float3 = world_ray_origin() + world_ray_direction() * ray_length();
+		var normal: float3 = normalize(object_to_world3x3() * float3(0, 1, 0));
+	    var reflected: float3 = reflect(normalize(world_ray_direction()), normal);
+
+	    var mirrorRay: ray;
+	    mirrorRay.origin = pos;
+	    mirrorRay.direction = reflected;
+	    mirrorRay.min = 0.001;
+	    mirrorRay.max = 1000;
+
+	    payload.allow_reflection = false;
+	    trace_ray(scene, mirrorRay, payload);
+	}
+}
+
+fun hit_floor(payload: ray_payload, uv: float2): void {
+    var pos: float3 = world_ray_origin() + world_ray_direction() * ray_length();
+
+    var pattern_x: bool = frac(pos.x) > 0.5;
+    var pattern_y: bool = frac(pos.z) > 0.5;
+    if (pattern_x ^ pattern_y) {
+    	payload.color = float3(0.6, 0.6, 0.6);
+    }
+    else {
+    	payload.color = float3(0.4, 0.4, 0.4);
+    }
+
+    var shadowRay: ray;
+    shadowRay.origin = pos;
+    shadowRay.direction = light - pos;
+    shadowRay.min = 0.001;
+    shadowRay.max = 1;
+
+    var shadow: ray_payload;
+    shadow.allow_reflection = false;
+    shadow.missed = false;
+    trace_ray(scene, shadowRay, shadow);
+
+    if (!shadow.missed) {
+        payload.color /= 2.0;
+    }
+}
+
 fun closesthit(payload: ray_payload, uv: float2): void {
-    payload.color = float3(1, 0, 1);
+	if (instance_id() == 0) {
+		hit_cube(payload, uv);
+	}
+	else if (instance_id() == 1) {
+		hit_mirror(payload, uv);
+	}
+	else if (instance_id() == 2) {
+		hit_floor(payload, uv);
+	}
 }
 
 #[raypipe]
