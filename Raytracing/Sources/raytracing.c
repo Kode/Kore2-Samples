@@ -41,7 +41,7 @@ void update(void *data) {
 		kope_g5_command_list_prepare_raytracing_hierarchy(&list, &hierarchy);
 	}
 
-	kong_set_ray_pipeline(&list, &RayPipe);
+	kong_set_ray_pipeline(&list, &ray_pipe);
 
 	kong_set_descriptor_set_rayset(&list, &rayset);
 
@@ -123,7 +123,7 @@ int kickstart(int argc, char **argv) {
 	{
 		rayset_parameters parameters;
 		parameters.scene = &hierarchy.d3d12.acceleration_structure;
-		parameters.uav = &texture;
+		parameters.render_target = &texture;
 		kong_create_rayset_set(&device, &parameters, &rayset);
 	}
 

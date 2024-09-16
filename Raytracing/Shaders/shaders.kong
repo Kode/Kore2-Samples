@@ -1,52 +1,6 @@
-struct vertex_in {
-	pos: float3;
-	tex: float2;
-}
-
-struct vertex_out {
-	pos: float4;
-	tex: float2;
-}
-
-#[set(everything)]
-const constants: {
-	mvp: float3x3;
-};
-
-fun pos(input: vertex_in): vertex_out {
-	var output: vertex_out;
-	
-	var position: float3;
-	position.xy = input.pos.xy;
-	position.z = 0.5;
-	
-	output.pos = float4(constants.mvp * position, 1.0);
-
-	output.tex = input.tex;
-	
-	return output;
-}
-
-#[set(everything)]
-const comp_texture: tex2d;
-
-#[set(everything)]
-const comp_sampler: sampler;
-
-fun pix(input: vertex_out): float4 {
-	var color: float4 = sample(comp_texture, comp_sampler, input.tex);
-	return float4(color.r, color.g, color.b, 1.0);
-}
-
-#[pipe]
-struct pipeline {
-	vertex = pos;
-	fragment = pix;
-}
-
 // based on https://landelare.github.io/2023/02/18/dxr-tutorial.html
 
-struct Payload {
+struct ray_payload {
     color: float3;
     allow_reflection: bool;
     missed: bool;
@@ -56,12 +10,12 @@ struct Payload {
 const scene: bvh;
 
 #[set(rayset), write]
-const uav: tex2d;
+const render_target: tex2d;
 
 const camera: float3 = float3(0, 1.5, -7);
 const light: float3 = float3(0, 200, 0);
-const skyTop: float3 = float3(0.24, 0.44, 0.72);
-const skyBottom: float3 = float3(0.75, 0.86, 0.93);
+const sky_top: float3 = float3(0.24, 0.44, 0.72);
+const sky_bottom: float3 = float3(0.75, 0.86, 0.93);
 
 fun sendrays(): void {
     var idx: uint2 = ray_index().xy;
@@ -78,36 +32,30 @@ fun sendrays(): void {
     primary.min = 0.001;
     primary.max = 1000;
 
-    var payload: Payload;
+    var payload: ray_payload;
     payload.allow_reflection = true;
     payload.missed = false;
 
     trace_ray(scene, primary, payload);
 
-    uav[idx] = float4(payload.color.r, payload.color.g, payload.color.b, 1);
+    render_target[idx] = float4(payload.color.r, payload.color.g, payload.color.b, 1);
 }
 
-fun raymissed(payload: Payload): void {
+fun raymissed(payload: ray_payload): void {
     var slope: float = normalize(world_ray_direction()).y;
     var t: float = saturate(slope * 5 + 0.5);
-    payload.color = lerp(skyBottom, skyTop, t);
+    payload.color = lerp(sky_bottom, sky_top, t);
 
     payload.missed = true;
 }
 
-fun closesthit(payload: Payload, uv: float2): void {
+fun closesthit(payload: ray_payload, uv: float2): void {
     payload.color = float3(1, 0, 1);
 }
 
-//fun intersect(): void {}
-
-//fun anyhit(payload: Payload, uv: float2): void {}
-
 #[raypipe]
-struct RayPipe {
+struct ray_pipe {
     gen = sendrays;
     miss = raymissed;
     closest = closesthit;
-    //intersection = intersect;
-    //any = anyhit;
 }
