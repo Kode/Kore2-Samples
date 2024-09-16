@@ -5,3 +5,4 @@
 **/Deployment/*.frag
 **/Deployment/*.vert
 **/Deployment/*.comp
+/nvapi
