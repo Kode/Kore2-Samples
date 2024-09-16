@@ -115,7 +115,7 @@ int kickstart(int argc, char **argv) {
 		kope_g5_buffer_unlock(&cubeIB);
 	}
 
-	kope_g5_device_create_raytracing_volume(&device, &cubeVB, sizeof(cubeVtx) / 4 / 3, NULL, 0, &cubeBlas);
+	kope_g5_device_create_raytracing_volume(&device, &cubeVB, sizeof(cubeVtx) / 4 / 3, &cubeIB, sizeof(cubeIdx) / 2, &cubeBlas);
 
 	kope_g5_raytracing_volume *volumes[] = {&cubeBlas, &quadBlas, &quadBlas};
 	kope_g5_device_create_raytracing_hierarchy(&device, volumes, 3, &hierarchy);
