@@ -29,6 +29,42 @@ static kope_g5_raytracing_hierarchy hierarchy;
 #define WIDTH 1024
 #define HEIGHT 768
 
+static kinc_matrix4x4_t transforms[3];
+
+static void update_transforms(void) {
+	float time = (float)kinc_time();
+
+	{
+		kinc_matrix4x4_t cube = kinc_matrix4x4_rotation_y(time / 3);
+		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_x(time / 2);
+		cube = kinc_matrix4x4_multiply(&a, &cube);
+		kinc_matrix4x4_t b = kinc_matrix4x4_rotation_z(time / 5);
+		cube = kinc_matrix4x4_multiply(&b, &cube);
+		kinc_matrix4x4_t c = kinc_matrix4x4_translation(-1.5, 2, 2);
+		cube = kinc_matrix4x4_multiply(&c, &cube);
+
+		transforms[0] = cube;
+	}
+
+	{
+		kinc_matrix4x4_t mirror = kinc_matrix4x4_rotation_x(-1.8f);
+		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_y(sinf(time) / 8 + 1);
+		mirror = kinc_matrix4x4_multiply(&a, &mirror);
+		kinc_matrix4x4_t b = kinc_matrix4x4_translation(2, 2, 2);
+		mirror = kinc_matrix4x4_multiply(&b, &mirror);
+
+		transforms[1] = mirror;
+	}
+
+	{
+		kinc_matrix4x4_t floor = kinc_matrix4x4_scale(5, 5, 5);
+		kinc_matrix4x4_t a = kinc_matrix4x4_translation(0, 0, 2);
+		floor = kinc_matrix4x4_multiply(&a, &floor);
+
+		transforms[2] = floor;
+	}
+}
+
 static bool first = true;
 
 void update(void *data) {
@@ -41,6 +77,9 @@ void update(void *data) {
 		kope_g5_command_list_prepare_raytracing_volume(&list, &quadBlas);
 		kope_g5_command_list_prepare_raytracing_hierarchy(&list, &hierarchy);
 	}
+
+	update_transforms();
+	kope_g5_command_list_update_raytracing_hierarchy(&list, transforms, 3, &hierarchy);
 
 	kong_set_ray_pipeline(&list, &ray_pipe);
 
@@ -120,39 +159,7 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_raytracing_volume *volumes[] = {&cubeBlas, &quadBlas, &quadBlas};
 
-	kinc_matrix4x4_t transforms[3];
-
-	float time = (float)kinc_time();
-
-	{
-		kinc_matrix4x4_t cube = kinc_matrix4x4_rotation_y(time / 3);
-		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_x(time / 2);
-		cube = kinc_matrix4x4_multiply(&a, &cube);
-		kinc_matrix4x4_t b = kinc_matrix4x4_rotation_z(time / 5);
-		cube = kinc_matrix4x4_multiply(&b, &cube);
-		kinc_matrix4x4_t c = kinc_matrix4x4_translation(-1.5, 2, 2);
-		cube = kinc_matrix4x4_multiply(&c, &cube);
-
-		transforms[0] = cube;
-	}
-
-	{
-		kinc_matrix4x4_t mirror = kinc_matrix4x4_rotation_x(-1.8f);
-		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_y(sinf(time) / 8 + 1);
-		mirror = kinc_matrix4x4_multiply(&a, &mirror);
-		kinc_matrix4x4_t b = kinc_matrix4x4_translation(2, 2, 2);
-		mirror = kinc_matrix4x4_multiply(&b, &mirror);
-
-		transforms[1] = mirror;
-	}
-
-	{
-		kinc_matrix4x4_t floor = kinc_matrix4x4_scale(5, 5, 5);
-		kinc_matrix4x4_t a = kinc_matrix4x4_translation(0, 0, 2);
-		floor = kinc_matrix4x4_multiply(&a, &floor);
-
-		transforms[2] = floor;
-	}
+	update_transforms();
 
 	kope_g5_device_create_raytracing_hierarchy(&device, volumes, transforms, 3, &hierarchy);
 
