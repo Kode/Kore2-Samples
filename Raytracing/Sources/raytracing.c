@@ -30,7 +30,6 @@ static kope_g5_raytracing_volume cubeBlas;
 static kope_g5_raytracing_volume quadBlas;
 
 static kope_g5_raytracing_hierarchy hierarchy;
-static kope_g5_texture render_target;
 
 #define WIDTH 1024
 #define HEIGHT 768
@@ -96,16 +95,16 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
-	kope_g5_texture_parameters texture_parameters;
-	texture_parameters.width = 256;
-	texture_parameters.height = 256;
-	texture_parameters.depth_or_array_layers = 1;
-	texture_parameters.mip_level_count = 1;
-	texture_parameters.sample_count = 1;
-	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
-	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_READ_WRITE;
-	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
+	kope_g5_texture_parameters render_target_parameters;
+	render_target_parameters.width = 1024;
+	render_target_parameters.height = 768;
+	render_target_parameters.depth_or_array_layers = 1;
+	render_target_parameters.mip_level_count = 1;
+	render_target_parameters.sample_count = 1;
+	render_target_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+	render_target_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	render_target_parameters.usage = KONG_G5_TEXTURE_USAGE_READ_WRITE;
+	kope_g5_device_create_texture(&device, &render_target_parameters, &texture);
 
 	kope_g5_sampler_parameters sampler_parameters;
 	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
@@ -205,21 +204,10 @@ int kickstart(int argc, char **argv) {
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
 
-	kope_g5_texture_parameters render_target_parameters;
-	render_target_parameters.width = 1024;
-	render_target_parameters.height = 768;
-	render_target_parameters.depth_or_array_layers = 1;
-	render_target_parameters.mip_level_count = 1;
-	render_target_parameters.sample_count = 1;
-	render_target_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	render_target_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-	render_target_parameters.usage = KONG_G5_TEXTURE_USAGE_READ_WRITE;
-	kope_g5_device_create_texture(&device, &render_target_parameters, &render_target);
-
 	{
 		rayset_parameters parameters;
 		parameters.scene = &hierarchy.d3d12.acceleration_structure;
-		parameters.uav = &render_target;
+		parameters.uav = &texture;
 		kong_create_rayset_set(&device, &parameters, &rayset);
 	}
 
