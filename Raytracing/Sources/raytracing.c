@@ -85,7 +85,7 @@ void update(void *data) {
 
 	kong_set_descriptor_set_rayset(&list, &rayset);
 
-	kope_g5_command_list_trace_rays(&list);
+	kope_g5_command_list_trace_rays(&list, 1024, 768, 1);
 
 	kope_uint3 size;
 	size.x = 1024;

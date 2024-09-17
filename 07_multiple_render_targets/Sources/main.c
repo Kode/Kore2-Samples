@@ -13,82 +13,108 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static kinc_g4_render_target_t target0;
-static kinc_g4_render_target_t target1;
-static kinc_g4_render_target_t target2;
-static kinc_g4_render_target_t target3;
-extern uint32_t *kinc_internal_g1_image;
-static uint8_t pixels0[512 * 384 * 4];
-static uint8_t pixels1[512 * 384 * 4];
-static uint8_t pixels2[512 * 384 * 4];
-static uint8_t pixels3[512 * 384 * 4];
-
-#define HEAP_SIZE 1024 * 1024
-static uint8_t *heap = NULL;
-static size_t heap_top = 0;
-
-static void *allocate(size_t size) {
-	size_t old_top = heap_top;
-	heap_top += size;
-	assert(heap_top <= HEAP_SIZE);
-	return &heap[old_top];
-}
-
-static void draw_image(uint8_t *pixels, int x, int y) {
-	uint8_t *g1image = (uint8_t *)kinc_internal_g1_image;
-	for (int i = 0; i < 512 * 384; ++i) {
-		int xpos = i % 512 + x;
-		int ypos = i / 512 + y;
-		// if (kinc_g4_render_targets_inverted_y()) {}
-		int j = ypos * 1024 + xpos;
-		g1image[j * 4] = pixels[i * 4];
-		g1image[j * 4 + 1] = pixels[i * 4 + 1];
-		g1image[j * 4 + 2] = pixels[i * 4 + 2];
-		g1image[j * 4 + 3] = pixels[i * 4 + 3];
-	}
-}
+static kope_g5_device device;
+static kope_g5_command_list list;
+static vertex_in_buffer vertices;
+static kope_g5_buffer indices;
+static kope_g5_texture render_targets[4];
 
 static void update(void *data) {
-	kinc_g4_render_target_t *targets[] = {&target0, &target1, &target2, &target3};
-	kinc_g4_set_render_targets(targets, 4);
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
-	kinc_g4_set_pipeline(&pipeline);
-	kinc_g4_set_vertex_buffer(&vertices);
-	kinc_g4_set_index_buffer(&indices);
-	kinc_g4_draw_indexed_vertices();
-	kinc_g4_restore_render_target();
+	kope_g5_render_pass_parameters parameters = {0};
+	for (uint32_t i = 0; i < 4; ++i) {
+		parameters.color_attachments[i].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		kope_g5_color clear_color;
+		clear_color.r = 0.0f;
+		clear_color.g = 0.0f;
+		clear_color.b = 0.0f;
+		clear_color.a = 1.0f;
+		parameters.color_attachments[i].clear_value = clear_color;
+		parameters.color_attachments[i].texture = &render_targets[i];
+	}
+	parameters.color_attachments_count = 4;
+	parameters.depth_stencil_attachments_count = 0;
+	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
-	kinc_g4_render_target_get_pixels(&target0, pixels0);
-	kinc_g4_render_target_get_pixels(&target1, pixels1);
-	kinc_g4_render_target_get_pixels(&target2, pixels2);
-	kinc_g4_render_target_get_pixels(&target3, pixels3);
+	kong_set_render_pipeline(&list, &pipeline);
 
-	kinc_g1_begin();
-	draw_image(pixels0, 0, 0);
-	draw_image(pixels1, 512, 0);
-	draw_image(pixels2, 0, 384);
-	draw_image(pixels3, 512, 384);
-	kinc_g1_end();
+	kong_set_vertex_buffer_vertex_in(&list, &vertices);
+
+	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+
+	kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+
+	kope_g5_command_list_end_render_pass(&list);
+
+	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
+
+	kope_g5_image_copy_texture destination = {0};
+	destination.texture = framebuffer;
+	destination.aspect = KOPE_G5_IMAGE_COPY_ASPECT_ALL;
+	destination.mip_level = 0;
+	destination.origin_x = 0;
+	destination.origin_y = 0;
+	destination.origin_z = 0;
+
+	kope_g5_image_copy_texture source = {0};
+	source.texture = &render_targets[0];
+	source.aspect = KOPE_G5_IMAGE_COPY_ASPECT_ALL;
+	source.mip_level = 0;
+	source.origin_x = 0;
+	source.origin_y = 0;
+	source.origin_z = 0;
+
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+
+	destination.origin_x = 512;
+	destination.origin_y = 0;
+	source.texture = &render_targets[1];
+
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+
+	destination.origin_x = 0;
+	destination.origin_y = 384;
+	source.texture = &render_targets[2];
+
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+
+	destination.origin_x = 512;
+	destination.origin_y = 384;
+	source.texture = &render_targets[3];
+
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+
+	kope_g5_command_list_present(&list);
+
+	kope_g5_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
 	kinc_init("Example", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
-	heap = (uint8_t *)malloc(HEAP_SIZE);
-	assert(heap != NULL);
+	kope_g5_device_wishlist wishlist = {0};
+	kope_g5_device_create(&device, &wishlist);
 
-	kinc_g4_render_target_init(&target0, 512, 384, KINC_G4_RENDER_TARGET_FORMAT_32BIT, 0, 0);
-	kinc_g4_render_target_init(&target1, 512, 384, KINC_G4_RENDER_TARGET_FORMAT_32BIT, 0, 0);
-	kinc_g4_render_target_init(&target2, 512, 384, KINC_G4_RENDER_TARGET_FORMAT_32BIT, 0, 0);
-	kinc_g4_render_target_init(&target3, 512, 384, KINC_G4_RENDER_TARGET_FORMAT_32BIT, 0, 0);
-	kinc_g1_init(1024, 768);
+	kong_init(&device);
 
-	kinc_g4_vertex_buffer_init(&vertices, 3, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
+	kope_g5_device_create_command_list(&device, &list);
+
+	for (uint32_t i = 0; i < 4; ++i) {
+		kope_g5_texture_parameters texture_parameters;
+		texture_parameters.width = 512;
+		texture_parameters.height = 384;
+		texture_parameters.depth_or_array_layers = 1;
+		texture_parameters.mip_level_count = 1;
+		texture_parameters.sample_count = 1;
+		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_COPY_SRC;
+		kope_g5_device_create_texture(&device, &texture_parameters, &render_targets[i]);
+	}
+
+	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
-		vertex_in *v = (vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices);
+		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
 
 		v[0].pos.x = -1.0;
 		v[0].pos.y = -1.0;
@@ -102,16 +128,19 @@ int kickstart(int argc, char **argv) {
 		v[2].pos.y = 1.0;
 		v[2].pos.z = 0.0;
 
-		kinc_g4_vertex_buffer_unlock_all(&vertices);
+		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
-	kinc_g4_index_buffer_init(&indices, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
+	kope_g5_buffer_parameters params;
+	params.size = 3 * sizeof(uint16_t);
+	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices);
+		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
-		kinc_g4_index_buffer_unlock_all(&indices);
+		kope_g5_buffer_unlock(&indices);
 	}
 
 	kinc_start();
