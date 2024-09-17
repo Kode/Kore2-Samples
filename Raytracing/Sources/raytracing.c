@@ -165,7 +165,7 @@ int kickstart(int argc, char **argv) {
 
 	{
 		rayset_parameters parameters;
-		parameters.scene = &hierarchy.d3d12.acceleration_structure;
+		parameters.scene = &hierarchy;
 		parameters.render_target = &texture;
 		kong_create_rayset_set(&device, &parameters, &rayset);
 	}
