@@ -26,8 +26,8 @@ static kope_g5_raytracing_volume quadBlas;
 
 static kope_g5_raytracing_hierarchy hierarchy;
 
-#define WIDTH 1024
-#define HEIGHT 768
+static const uint32_t width = 1920;
+static const uint32_t height = 1080;
 
 static kinc_matrix4x4_t transforms[3];
 
@@ -85,13 +85,15 @@ void update(void *data) {
 
 	kong_set_descriptor_set_rayset(&list, &rayset);
 
-	kope_g5_command_list_trace_rays(&list, 1024, 768, 1);
+	kope_g5_command_list_trace_rays(&list, width, height, 1);
 
-	kope_uint3 size;
-	size.x = 1024;
-	size.y = 768;
-	size.z = 1;
-	kope_g5_command_list_copy_texture_to_texture(&list, &texture, framebuffer, size);
+	kope_g5_image_copy_texture source = {0};
+	source.texture = &texture;
+
+	kope_g5_image_copy_texture destination = {0};
+	destination.texture = framebuffer;
+
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width, height, 1);
 
 	kope_g5_command_list_present(&list);
 
@@ -99,7 +101,7 @@ void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Raytracing", 1024, 768, NULL, NULL);
+	kinc_init("Raytracing", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -108,8 +110,8 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 	kope_g5_texture_parameters render_target_parameters;
-	render_target_parameters.width = 1024;
-	render_target_parameters.height = 768;
+	render_target_parameters.width = width;
+	render_target_parameters.height = height;
 	render_target_parameters.depth_or_array_layers = 1;
 	render_target_parameters.mip_level_count = 1;
 	render_target_parameters.sample_count = 1;
