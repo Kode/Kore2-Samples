@@ -1,6 +1,8 @@
 #include <kinc/io/filereader.h>
 #include <kinc/system.h>
 
+#include <kope/direct3d12/commandlist_functions.h>
+
 #include <kong.h>
 
 #include <assert.h>
@@ -10,7 +12,12 @@ static kope_g5_device device;
 static kope_g5_command_list list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
-static kope_g5_texture render_target;
+static kope_g5_texture float_render_target;
+static kope_g5_texture render_target; // intermediate target because D3D12 doesn't seem to like uav framebuffer access
+static compute_set set;
+
+const static int width = 1024;
+const static int height = 768;
 
 static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};
@@ -21,7 +28,8 @@ static void update(void *data) {
 	clear_color.b = 0.0f;
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture = &render_target;
+	parameters.color_attachments[0].texture = &float_render_target;
+	parameters.color_attachments_count = 1;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -36,13 +44,22 @@ static void update(void *data) {
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
+	kong_set_compute_pipeline(&list, &comp);
+
+	kong_set_descriptor_set_compute(&list, &set);
+
+	uint32_t root_constants_data[2] = {width, height};
+	kope_d3d12_command_list_set_root_constants(&list, root_constants_data, 2 * 4);
+
+	kope_g5_command_list_compute(&list, (width + 7) / 8, (height + 7) / 8, 1);
+
 	kope_g5_image_copy_texture source = {0};
 	source.texture = &render_target;
 
 	kope_g5_image_copy_texture destination = {0};
 	destination.texture = framebuffer;
 
-	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 1024, 768, 1);
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width, height, 1);
 
 	kope_g5_command_list_present(&list);
 
@@ -50,7 +67,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -60,16 +77,31 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_command_list(&device, &list);
 
-	kope_g5_texture_parameters texture_parameters;
-	texture_parameters.width = 1024;
-	texture_parameters.height = 768;
-	texture_parameters.depth_or_array_layers = 1;
-	texture_parameters.mip_level_count = 1;
-	texture_parameters.sample_count = 1;
-	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
-	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_COPY_SRC;
-	kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
+	{
+		kope_g5_texture_parameters texture_parameters;
+		texture_parameters.width = width;
+		texture_parameters.height = height;
+		texture_parameters.depth_or_array_layers = 1;
+		texture_parameters.mip_level_count = 1;
+		texture_parameters.sample_count = 1;
+		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
+		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
+		kope_g5_device_create_texture(&device, &texture_parameters, &float_render_target);
+	}
+
+	{
+		kope_g5_texture_parameters texture_parameters;
+		texture_parameters.width = width;
+		texture_parameters.height = height;
+		texture_parameters.depth_or_array_layers = 1;
+		texture_parameters.mip_level_count = 1;
+		texture_parameters.sample_count = 1;
+		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_READ_WRITE;
+		kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
+	}
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
@@ -101,6 +133,11 @@ int kickstart(int argc, char **argv) {
 		i[2] = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
+
+	compute_parameters cparams = {0};
+	cparams.copy_source_texture = &float_render_target;
+	cparams.copy_destination_texture = &render_target;
+	kong_create_compute_set(&device, &cparams, &set);
 
 	kinc_start();
 
