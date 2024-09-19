@@ -48,8 +48,10 @@ static void update(void *data) {
 
 	kong_set_descriptor_set_compute(&list, &set);
 
-	uint32_t root_constants_data[2] = {width, height};
-	kope_d3d12_command_list_set_root_constants(&list, root_constants_data, 2 * 4);
+	copy_constants_type copy_constants;
+	copy_constants.size.x = width;
+	copy_constants.size.y = height;
+	kong_set_root_constants_copy_constants(&list, &copy_constants);
 
 	kope_g5_command_list_compute(&list, (width + 7) / 8, (height + 7) / 8, 1);
 

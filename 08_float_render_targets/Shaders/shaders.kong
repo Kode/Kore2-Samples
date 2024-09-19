@@ -30,6 +30,7 @@ fun pix(input: vertex_out): float4 {
 struct pipeline {
 	vertex = pos;
 	fragment = pix;
+	format = TEXTURE_FORMAT_RGBA32_FLOAT;
 }
 
 #[root_constants]
