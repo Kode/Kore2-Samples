@@ -1,6 +1,6 @@
 const project = new Project('DepthRenderTargets');
 
-await project.addProject('../Kinc', {kong: true});
+await project.addProject('../Kinc', {kong: true, kope: true});
 
 project.addFile('Sources/**');
 project.addKongDir('Shaders');

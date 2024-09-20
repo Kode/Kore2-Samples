@@ -57,7 +57,10 @@ fun fs_pos(input: fs_vertex_in): fs_vertex_out {
 	return output;
 }
 
+#[set(fs)]
 const fs_texture: tex2d;
+
+#[set(fs)]
 const fs_sampler: sampler;
 
 fun fs_pix(input: fs_vertex_out): float4 {
