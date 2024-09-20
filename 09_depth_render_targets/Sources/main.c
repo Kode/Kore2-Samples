@@ -21,10 +21,9 @@ static const uint32_t height = 768;
 static void update(void *data) {
 	{
 		kope_g5_render_pass_parameters parameters = {0};
-		parameters.depth_stencil_attachments_count = 1;
-		parameters.depth_stencil_attachments[0].depth_load_op = KOPE_G5_LOAD_OP_CLEAR;
-		parameters.depth_stencil_attachments[0].depth_clear_value = 1.0;
-		parameters.depth_stencil_attachments[0].texture = &render_target;
+		parameters.depth_stencil_attachment.depth_load_op = KOPE_G5_LOAD_OP_CLEAR;
+		parameters.depth_stencil_attachment.depth_clear_value = 1.0;
+		parameters.depth_stencil_attachment.texture = &render_target;
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 		kong_set_render_pipeline(&list, &pipeline);
