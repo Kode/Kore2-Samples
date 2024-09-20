@@ -53,7 +53,7 @@ static void update(void *data) {
 		parameters.color_attachments[0].texture = framebuffer;
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
-		kong_set_render_pipeline(&list, &pipeline);
+		kong_set_render_pipeline(&list, &fs_pipeline);
 
 		kong_set_descriptor_set_fs(&list, &set);
 
