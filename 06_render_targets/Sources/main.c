@@ -12,6 +12,9 @@ static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_texture render_target;
 
+static const uint32_t width = 1024;
+static const uint32_t height = 768;
+
 static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
@@ -20,6 +23,7 @@ static void update(void *data) {
 	clear_color.g = 0.0f;
 	clear_color.b = 0.0f;
 	clear_color.a = 1.0f;
+	parameters.color_attachments_count = 1;
 	parameters.color_attachments[0].clear_value = clear_color;
 	parameters.color_attachments[0].texture = &render_target;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
@@ -36,11 +40,13 @@ static void update(void *data) {
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
-	kope_uint3 size;
-	size.x = 1024;
-	size.y = 768;
-	size.z = 1;
-	kope_g5_command_list_copy_texture_to_texture(&list, &render_target, framebuffer, size);
+	kope_g5_image_copy_texture source = {0};
+	source.texture = &render_target;
+
+	kope_g5_image_copy_texture destination = {0};
+	destination.texture = framebuffer;
+
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width, height, 1);
 
 	kope_g5_command_list_present(&list);
 
@@ -48,7 +54,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -59,8 +65,8 @@ int kickstart(int argc, char **argv) {
 	kope_g5_device_create_command_list(&device, &list);
 
 	kope_g5_texture_parameters texture_parameters;
-	texture_parameters.width = 1024;
-	texture_parameters.height = 768;
+	texture_parameters.width = width;
+	texture_parameters.height = height;
 	texture_parameters.depth_or_array_layers = 1;
 	texture_parameters.mip_level_count = 1;
 	texture_parameters.sample_count = 1;
