@@ -57,6 +57,12 @@ fun pix(input: vertex_out): float4[6] {
 struct pipeline {
 	vertex = pos;
 	fragment = pix;
+	format0 = TEXTURE_FORMAT_RGBA8_UNORM;
+	format1 = TEXTURE_FORMAT_RGBA8_UNORM;
+	format2 = TEXTURE_FORMAT_RGBA8_UNORM;
+	format3 = TEXTURE_FORMAT_RGBA8_UNORM;
+	format4 = TEXTURE_FORMAT_RGBA8_UNORM;
+	format5 = TEXTURE_FORMAT_RGBA8_UNORM;
 }
 
 struct fs_vertex_in {
