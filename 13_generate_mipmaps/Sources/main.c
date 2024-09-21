@@ -1,174 +1,182 @@
-#include <kinc/graphics4/graphics.h>
-#include <kinc/graphics4/indexbuffer.h>
-#include <kinc/graphics4/pipeline.h>
-#include <kinc/graphics4/rendertarget.h>
-#include <kinc/graphics4/shader.h>
-#include <kinc/graphics4/texture.h>
-#include <kinc/graphics4/vertexbuffer.h>
-#include <kinc/image.h>
 #include <kinc/io/filereader.h>
 #include <kinc/system.h>
+
+#include <kong.h>
 
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_shader_t vertex_shader;
-static kinc_g4_shader_t fragment_shader;
-static kinc_g4_pipeline_t pipeline;
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static kinc_g4_shader_t vertex_shader_fs;
-static kinc_g4_shader_t fragment_shader_fs;
-static kinc_g4_pipeline_t pipeline_fs;
-static kinc_g4_vertex_buffer_t vertices_fs;
-static kinc_g4_index_buffer_t indices_fs;
-static kinc_g4_texture_unit_t tex_unit;
-static kinc_g4_render_target_t target;
-static uint8_t pixels[1024 * 1024 * 4];
-
-#define HEAP_SIZE 1024 * 1024
-static uint8_t *heap = NULL;
-static size_t heap_top = 0;
-
-static void *allocate(size_t size) {
-	size_t old_top = heap_top;
-	heap_top += size;
-	assert(heap_top <= HEAP_SIZE);
-	return &heap[old_top];
-}
+static kope_g5_device device;
+static kope_g5_command_list list;
+static vertex_in_buffer vertices;
+static fs_vertex_in_buffer vertices_fs;
+static kope_g5_buffer indices;
+static kope_g5_texture render_target;
+static kope_g5_sampler sampler;
+static fs_set set;
+static mip_set mip_sets[4];
 
 static void update(void *data) {
-	kinc_g4_begin(0);
+	{
+		kope_g5_render_pass_parameters parameters = {0};
+		parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		kope_g5_color clear_color;
+		clear_color.r = 0.0f;
+		clear_color.g = 0.0f;
+		clear_color.b = 0.0f;
+		clear_color.a = 1.0f;
+		parameters.color_attachments[0].clear_value = clear_color;
+		parameters.color_attachments[0].texture = &render_target;
+		parameters.color_attachments_count = 1;
+		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
-	kinc_g4_render_target_t *targets = {&target};
-	kinc_g4_set_render_targets(&targets, 1);
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
-	kinc_g4_set_pipeline(&pipeline);
-	kinc_g4_set_vertex_buffer(&vertices);
-	kinc_g4_set_index_buffer(&indices);
-	kinc_g4_draw_indexed_vertices();
+		kong_set_render_pipeline(&list, &pipeline);
 
-	kinc_g4_render_target_get_pixels(&target, pixels);
-	kinc_image_t image;
-	kinc_image_init_from_bytes(&image, pixels, 1024, 1024, KINC_IMAGE_FORMAT_RGBA32);
-	kinc_g4_texture_t texture;
-	kinc_g4_texture_init_from_image(&texture, &image);
-	kinc_image_destroy(&image);
-	kinc_g4_texture_generate_mipmaps(&texture, 10);
+		kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
-	kinc_g4_restore_render_target();
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
-	kinc_g4_set_pipeline(&pipeline_fs);
-	kinc_g4_set_texture(tex_unit, &texture);
-	kinc_g4_set_vertex_buffer(&vertices_fs);
-	kinc_g4_set_index_buffer(&indices_fs);
-	kinc_g4_draw_indexed_vertices();
+		kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
 
-	kinc_g4_end(0);
-	kinc_g4_swap_buffers();
-}
+		kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
 
-static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
-	kinc_file_reader_t file;
-	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
-	size_t data_size = kinc_file_reader_size(&file);
-	uint8_t *data = allocate(data_size);
-	kinc_file_reader_read(&file, data, data_size);
-	kinc_file_reader_close(&file);
-	kinc_g4_shader_init(shader, data, data_size, shader_type);
+		kope_g5_command_list_end_render_pass(&list);
+	}
+
+	kong_set_compute_pipeline(&list, &comp);
+
+	int width_height = 1024;
+
+	for (int i = 0; i < 4; ++i) {
+		width_height /= 2;
+
+		kong_set_descriptor_set_mip(&list, &mip_sets[i]);
+
+		mip_constants_type mip_constants;
+		mip_constants.size.x = width_height;
+		mip_constants.size.y = width_height;
+		kong_set_root_constants_mip_constants(&list, &mip_constants);
+
+		kope_g5_command_list_compute(&list, (width_height + 7) / 8, (width_height + 7) / 8, 1);
+	}
+
+	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
+
+	{
+		kope_g5_render_pass_parameters parameters = {0};
+		parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		kope_g5_color clear_color;
+		clear_color.r = 0.0f;
+		clear_color.g = 0.0f;
+		clear_color.b = 0.0f;
+		clear_color.a = 1.0f;
+		parameters.color_attachments[0].clear_value = clear_color;
+		parameters.color_attachments[0].texture = framebuffer;
+		parameters.color_attachments_count = 1;
+		kope_g5_command_list_begin_render_pass(&list, &parameters);
+
+		kong_set_render_pipeline(&list, &fs_pipeline);
+
+		kong_set_descriptor_set_fs(&list, &set);
+
+		kong_set_vertex_buffer_fs_vertex_in(&list, &vertices_fs);
+
+		kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+
+		kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+
+		kope_g5_command_list_end_render_pass(&list);
+	}
+
+	kope_g5_command_list_present(&list);
+
+	kope_g5_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
 	kinc_init("Example", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
-	heap = (uint8_t *)malloc(HEAP_SIZE);
-	assert(heap != NULL);
+	kope_g5_device_wishlist wishlist = {0};
+	kope_g5_device_create(&device, &wishlist);
 
-	load_shader("shader.vert", &vertex_shader, KINC_G4_SHADER_TYPE_VERTEX);
-	load_shader("shader.frag", &fragment_shader, KINC_G4_SHADER_TYPE_FRAGMENT);
+	kong_init(&device);
 
-	kinc_g4_vertex_structure_t structure;
-	kinc_g4_vertex_structure_init(&structure);
-	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_F32_3X);
-	kinc_g4_pipeline_init(&pipeline);
-	pipeline.vertex_shader = &vertex_shader;
-	pipeline.fragment_shader = &fragment_shader;
-	pipeline.input_layout[0] = &structure;
-	pipeline.input_layout[1] = NULL;
-	pipeline.depth_write = true;
-	pipeline.depth_mode = KINC_G4_COMPARE_LESS;
-	kinc_g4_pipeline_compile(&pipeline);
+	kope_g5_device_create_command_list(&device, &list);
 
-	kinc_g4_render_target_init(&target, 1024, 1024, KINC_G4_RENDER_TARGET_FORMAT_32BIT, 0, 0);
-
-	kinc_g4_vertex_buffer_init(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
 	{
-		float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
-		int i = 0;
-
-		v[i++] = -1.0;
-		v[i++] = kinc_g4_render_targets_inverted_y() ? -1.0f : 1.0f;
-		v[i++] = 0.0;
-
-		v[i++] = 1.0;
-		v[i++] = kinc_g4_render_targets_inverted_y() ? -1.0f : 1.0f;
-		v[i++] = 0.0;
-
-		v[i++] = 0.0;
-		v[i++] = kinc_g4_render_targets_inverted_y() ? 1.0f : -1.0f;
-		v[i++] = 0.0;
-
-		kinc_g4_vertex_buffer_unlock_all(&vertices);
+		kope_g5_texture_parameters texture_parameters = {0};
+		texture_parameters.width = 1024;
+		texture_parameters.height = 1024;
+		texture_parameters.depth_or_array_layers = 1;
+		texture_parameters.mip_level_count = 5;
+		texture_parameters.sample_count = 1;
+		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_READ_WRITE;
+		kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
 	}
 
-	kinc_g4_index_buffer_init(&indices, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
+	kope_g5_sampler_parameters sampler_params = {0};
+	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
+
+	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
-		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices);
+		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
+
+		v[0].pos.x = -1.0;
+		v[0].pos.y = 1.0;
+		v[0].pos.z = 0.0;
+
+		v[1].pos.x = 1.0;
+		v[1].pos.y = 1.0;
+		v[1].pos.z = 0.0;
+
+		v[2].pos.x = 0.0;
+		v[2].pos.y = -1.0;
+		v[2].pos.z = 0.0;
+
+		kong_vertex_in_buffer_unlock(&vertices);
+	}
+
+	kong_create_buffer_fs_vertex_in(&device, 3, &vertices_fs);
+	{
+		fs_vertex_in *v = kong_fs_vertex_in_buffer_lock(&vertices_fs);
+
+		v[0].pos.x = -1.0;
+		v[0].pos.y = -1.0;
+
+		v[1].pos.x = 3.0;
+		v[1].pos.y = -1.0;
+
+		v[2].pos.x = -1.0;
+		v[2].pos.y = 3.0;
+
+		kong_fs_vertex_in_buffer_unlock(&vertices_fs);
+	}
+
+	kope_g5_buffer_parameters params;
+	params.size = 3 * sizeof(uint16_t);
+	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+	kope_g5_device_create_buffer(&device, &params, &indices);
+	{
+		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
-		kinc_g4_index_buffer_unlock_all(&indices);
+		kope_g5_buffer_unlock(&indices);
 	}
 
-	load_shader("shader_fs.vert", &vertex_shader_fs, KINC_G4_SHADER_TYPE_VERTEX);
-	load_shader("shader_fs.frag", &fragment_shader_fs, KINC_G4_SHADER_TYPE_FRAGMENT);
+	fs_parameters fsparams = {0};
+	fsparams.fs_texture = &render_target;
+	fsparams.fs_sampler = &sampler;
+	kong_create_fs_set(&device, &fsparams, &set);
 
-	kinc_g4_vertex_structure_t structure_fs;
-	kinc_g4_vertex_structure_init(&structure_fs);
-	kinc_g4_vertex_structure_add(&structure_fs, "pos", KINC_G4_VERTEX_DATA_F32_2X);
-	kinc_g4_pipeline_init(&pipeline_fs);
-	pipeline_fs.vertex_shader = &vertex_shader_fs;
-	pipeline_fs.fragment_shader = &fragment_shader_fs;
-	pipeline_fs.input_layout[0] = &structure_fs;
-	pipeline_fs.input_layout[1] = NULL;
-	kinc_g4_pipeline_compile(&pipeline_fs);
-	tex_unit = kinc_g4_pipeline_get_texture_unit(&pipeline_fs, "tex");
-
-	kinc_g4_vertex_buffer_init(&vertices_fs, 3, &structure_fs, KINC_G4_USAGE_STATIC, 0);
-	{
-		float *v = kinc_g4_vertex_buffer_lock_all(&vertices_fs);
-		int i = 0;
-
-		v[i++] = -1.0;
-		v[i++] = -1.0;
-
-		v[i++] = 3.0;
-		v[i++] = -1.0;
-
-		v[i++] = -1.0;
-		v[i++] = 3.0;
-
-		kinc_g4_vertex_buffer_unlock_all(&vertices_fs);
-	}
-
-	kinc_g4_index_buffer_init(&indices_fs, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
-	{
-		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices_fs);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
-		kinc_g4_index_buffer_unlock_all(&indices_fs);
+	for (int i = 0; i < 4; ++i) {
+		mip_parameters cparams = {0};
+		cparams.mip_source_texture = &render_target;
+		cparams.mip_source_texture_mip_level = i;
+		cparams.mip_destination_texture = &render_target;
+		cparams.mip_destination_texture_mip_level = i + 1;
+		kong_create_mip_set(&device, &cparams, &mip_sets[i]);
 	}
 
 	kinc_start();

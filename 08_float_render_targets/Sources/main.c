@@ -1,8 +1,6 @@
 #include <kinc/io/filereader.h>
 #include <kinc/system.h>
 
-#include <kope/direct3d12/commandlist_functions.h>
-
 #include <kong.h>
 
 #include <assert.h>
