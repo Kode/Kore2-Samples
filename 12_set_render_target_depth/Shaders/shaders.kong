@@ -1,0 +1,63 @@
+struct vertex_in {
+	pos: float3;
+}
+
+struct vertex_out {
+	pos: float4;
+}
+
+fun pos(input: vertex_in): vertex_out {
+	var output: vertex_out;
+	output.pos = float4(input.pos.x, input.pos.y, 0.5, 1.0);
+	return output;
+}
+
+fun pixel(input: vertex_out): float4 {
+	var color: float4 = float4(1.0, 0.0, 0.0, 1.0);
+	return color;
+}
+
+#[pipe]
+struct pipeline {
+	vertex = pos;
+	fragment = pixel;
+	depth_stencil_format = TEXTURE_FORMAT_DEPTH32FLOAT;
+	depth_write = true;
+	depth_compare = COMPARE_LESS;
+}
+
+struct fs_vertex_in {
+	pos: float2;
+}
+
+struct fs_vertex_out {
+	pos: float4;
+	tex_coord: float2;
+}
+
+#[set(fs)]
+const fs_texture: tex2d;
+
+#[set(fs)]
+const fs_sampler: sampler;
+
+fun fs_pos(input: fs_vertex_in): fs_vertex_out {
+	var output: fs_vertex_out;
+
+	var madd: float2 = float2(0.5, 0.5);
+	output.tex_coord = input.pos.xy * madd + madd;
+
+	output.pos = float4(input.pos.x, input.pos.y, 0.0, 1.0);
+
+	return output;
+}
+
+fun fs_pixel(input: fs_vertex_out): float4 {
+	return sample_lod(fs_texture, fs_sampler, input.tex_coord, 0.0);
+}
+
+#[pipe]
+struct fs_pipeline {
+	vertex = fs_pos;
+	fragment = fs_pixel;
+}
