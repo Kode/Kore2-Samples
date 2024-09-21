@@ -80,7 +80,7 @@ fun fs_pos(input: fs_vertex_in): fs_vertex_out {
 	madd.y = 0.5;
 	
 	var output: fs_vertex_out;
-	output.tex_coord = input.pos.xy * madd + madd;
+	output.tex_coord = input.pos.xy;
 
 	output.pos.x = input.pos.x;
 	output.pos.y = input.pos.y;
@@ -98,8 +98,8 @@ const fs_sampler: sampler;
 
 fun fs_pix(input: fs_vertex_out): float4 {
 	var tex_coord: float3;
-	tex_coord.x = input.pos.x;
-	tex_coord.y = input.pos.y;
+	tex_coord.x = input.tex_coord.x;
+	tex_coord.y = input.tex_coord.y;
 	tex_coord.z = 0.0;
 	return sample_lod(fs_texture, fs_sampler, tex_coord, 0.0);
 }
