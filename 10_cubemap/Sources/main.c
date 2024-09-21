@@ -1,9 +1,3 @@
-#include <kinc/graphics4/graphics.h>
-#include <kinc/graphics4/indexbuffer.h>
-#include <kinc/graphics4/pipeline.h>
-#include <kinc/graphics4/rendertarget.h>
-#include <kinc/graphics4/shader.h>
-#include <kinc/graphics4/vertexbuffer.h>
 #include <kinc/io/filereader.h>
 #include <kinc/system.h>
 
@@ -12,90 +6,135 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static kinc_g4_vertex_buffer_t vertices_fs;
-static kinc_g4_index_buffer_t indices_fs;
-static kinc_g4_render_target_t target;
+static kope_g5_device device;
+static kope_g5_command_list list;
+static vertex_in_buffer vertices;
+static fs_vertex_in_buffer vertices_fs;
+static kope_g5_buffer indices;
+static kope_g5_texture render_target;
+static kope_g5_sampler sampler;
+static fs_set set;
 
-#define HEAP_SIZE 1024 * 1024
-static uint8_t *heap = NULL;
-static size_t heap_top = 0;
-
-static void *allocate(size_t size) {
-	size_t old_top = heap_top;
-	heap_top += size;
-	assert(heap_top <= HEAP_SIZE);
-	return &heap[old_top];
-}
+static const uint32_t width = 1024;
+static const uint32_t height = 768;
 
 static void update(void *data) {
-	kinc_g4_begin(0);
+	{
+		kope_g5_render_pass_parameters parameters = {0};
+		parameters.color_attachments_count = 6;
+		for (int i = 0; i < 6; ++i) {
+			parameters.color_attachments[i].depth_slice = i;
+			parameters.color_attachments[i].load_op = KOPE_G5_LOAD_OP_CLEAR;
+			kope_g5_color color;
+			color.r = 0.0f;
+			color.g = 0.0f;
+			color.b = 0.0f;
+			color.a = 1.0f;
+			parameters.color_attachments[i].clear_value = color;
+			parameters.color_attachments[i].texture = &render_target;
+		}
+		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
-	for (int i = 0; i < 6; ++i) {
-		kinc_g4_set_render_target_face(&target, i);
-		kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
-		kinc_g4_set_pipeline(&pipeline);
-		kinc_g4_set_vertex_buffer(&vertices);
-		kinc_g4_set_index_buffer(&indices);
-		kinc_g4_draw_indexed_vertices();
+		kong_set_render_pipeline(&list, &pipeline);
+
+		kong_set_vertex_buffer_vertex_in(&list, &vertices);
+
+		kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+
+		kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+
+		kope_g5_command_list_end_render_pass(&list);
 	}
 
-	kinc_g4_restore_render_target();
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
-	kinc_g4_set_pipeline(&fs_pipeline);
-	kinc_g4_render_target_use_color_as_texture(&target, fs_texture);
-	kinc_g4_set_vertex_buffer(&vertices_fs);
-	kinc_g4_set_index_buffer(&indices_fs);
-	kinc_g4_draw_indexed_vertices();
+	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
-	kinc_g4_end(0);
-	kinc_g4_swap_buffers();
+	{
+		kope_g5_render_pass_parameters parameters = {0};
+		parameters.color_attachments_count = 1;
+		parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		kope_g5_color color;
+		color.r = 0.0f;
+		color.g = 0.0f;
+		color.b = 0.0f;
+		color.a = 1.0f;
+		parameters.color_attachments[0].clear_value = color;
+		parameters.color_attachments[0].texture = framebuffer;
+		kope_g5_command_list_begin_render_pass(&list, &parameters);
+
+		kong_set_render_pipeline(&list, &fs_pipeline);
+
+		kong_set_descriptor_set_fs(&list, &set);
+
+		kong_set_vertex_buffer_fs_vertex_in(&list, &vertices_fs);
+
+		kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+
+		kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+
+		kope_g5_command_list_end_render_pass(&list);
+	}
+
+	kope_g5_command_list_present(&list);
+
+	kope_g5_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
-	heap = (uint8_t *)malloc(HEAP_SIZE);
-	assert(heap != NULL);
+	kope_g5_device_wishlist wishlist = {0};
+	kope_g5_device_create(&device, &wishlist);
 
-	// pipeline.depth_write = true;
-	// pipeline.depth_mode = KINC_G4_COMPARE_LESS;
+	kong_init(&device);
 
-	kinc_g4_render_target_init_cube(&target, 512, KINC_G4_RENDER_TARGET_FORMAT_32BIT, 0, 0);
+	kope_g5_device_create_command_list(&device, &list);
 
-	kinc_g4_vertex_buffer_init(&vertices, 3, &vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
+	kope_g5_texture_parameters texture_parameters;
+	texture_parameters.width = 512;
+	texture_parameters.height = 512;
+	texture_parameters.depth_or_array_layers = 6;
+	texture_parameters.mip_level_count = 1;
+	texture_parameters.sample_count = 1;
+	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
+	kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
+
+	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
-		vertex_in *v = (vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices);
+		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
 
 		v[0].pos.x = -1.0;
-		v[0].pos.y = kinc_g4_render_targets_inverted_y() ? -1.0f : 1.0f;
+		v[0].pos.y = 1.0;
 		v[0].pos.z = 0.0;
 
 		v[1].pos.x = 1.0;
-		v[1].pos.y = kinc_g4_render_targets_inverted_y() ? -1.0f : 1.0f;
+		v[1].pos.y = 1.0;
 		v[1].pos.z = 0.0;
 
 		v[2].pos.x = 0.0;
-		v[2].pos.y = kinc_g4_render_targets_inverted_y() ? 1.0f : -1.0f;
+		v[2].pos.y = -1.0;
 		v[2].pos.z = 0.0;
 
-		kinc_g4_vertex_buffer_unlock_all(&vertices);
+		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
-	kinc_g4_index_buffer_init(&indices, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
+	kope_g5_buffer_parameters params;
+	params.size = 3 * sizeof(uint16_t);
+	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices);
+		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
-		kinc_g4_index_buffer_unlock_all(&indices);
+		kope_g5_buffer_unlock(&indices);
 	}
 
-	kinc_g4_vertex_buffer_init(&vertices_fs, 3, &fs_vertex_in_structure, KINC_G4_USAGE_STATIC, 0);
+	kong_create_buffer_fs_vertex_in(&device, 3, &vertices_fs);
 	{
-		fs_vertex_in *v = (fs_vertex_in *)kinc_g4_vertex_buffer_lock_all(&vertices_fs);
+		fs_vertex_in *v = kong_fs_vertex_in_buffer_lock(&vertices_fs);
 
 		v[0].pos.x = -1.0;
 		v[0].pos.y = -1.0;
@@ -106,17 +145,16 @@ int kickstart(int argc, char **argv) {
 		v[2].pos.x = -1.0;
 		v[2].pos.y = 3.0;
 
-		kinc_g4_vertex_buffer_unlock_all(&vertices_fs);
+		kong_fs_vertex_in_buffer_unlock(&vertices_fs);
 	}
 
-	kinc_g4_index_buffer_init(&indices_fs, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
-	{
-		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices_fs);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
-		kinc_g4_index_buffer_unlock_all(&indices_fs);
-	}
+	kope_g5_sampler_parameters sampler_params = {0};
+	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
+
+	fs_parameters fs_params = {0};
+	fs_params.fs_texture = &render_target;
+	fs_params.fs_sampler = &sampler;
+	kong_create_fs_set(&device, &fs_params, &set);
 
 	kinc_start();
 

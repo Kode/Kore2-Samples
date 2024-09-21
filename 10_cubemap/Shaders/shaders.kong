@@ -17,12 +17,39 @@ fun pos(input: vertex_in): vertex_out {
 	return output;
 }
 
-fun pix(input: vertex_out): float4 {
-	var output: float4;
-	output.x = 1.0;
-	output.y = 0.0;
-	output.z = 0.0;
-	output.w = 1.0;
+fun pix(input: vertex_out): float4[6] {
+	var output: float4[6];
+	
+	output[0].x = 1.0;
+	output[0].y = 0.0;
+	output[0].z = 0.0;
+	output[0].w = 1.0;
+	
+	output[1].x = 1.0;
+	output[1].y = 0.0;
+	output[1].z = 0.0;
+	output[1].w = 1.0;
+	
+	output[2].x = 1.0;
+	output[2].y = 0.0;
+	output[2].z = 0.0;
+	output[2].w = 1.0;
+	
+	output[3].x = 1.0;
+	output[3].y = 0.0;
+	output[3].z = 0.0;
+	output[3].w = 1.0;
+	
+	output[4].x = 1.0;
+	output[4].y = 0.0;
+	output[4].z = 0.0;
+	output[4].w = 1.0;
+	
+	output[5].x = 1.0;
+	output[5].y = 0.0;
+	output[5].z = 0.0;
+	output[5].w = 1.0;
+	
 	return output;
 }
 
@@ -51,13 +78,16 @@ fun fs_pos(input: fs_vertex_in): fs_vertex_out {
 
 	output.pos.x = input.pos.x;
 	output.pos.y = input.pos.y;
-	output.pos.z = 0.0;
+	output.pos.z = 0.5;
 	output.pos.w = 1.0;
 
 	return output;
 }
 
+#[set(fs)]
 const fs_texture: texcube;
+
+#[set(fs)]
 const fs_sampler: sampler;
 
 fun fs_pix(input: fs_vertex_out): float4 {
