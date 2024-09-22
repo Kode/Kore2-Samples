@@ -167,6 +167,7 @@ int kickstart(int argc, char **argv) {
 
 	fs_parameters fsparams = {0};
 	fsparams.fs_texture = &render_target;
+	fsparams.fs_texture_mip_level = 4;
 	fsparams.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &fsparams, &set);
 
