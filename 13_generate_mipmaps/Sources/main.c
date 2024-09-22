@@ -116,6 +116,8 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kope_g5_sampler_parameters sampler_params = {0};
+	sampler_params.lod_min_clamp = 0;
+	sampler_params.lod_max_clamp = 5;
 	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
@@ -167,14 +169,16 @@ int kickstart(int argc, char **argv) {
 
 	fs_parameters fsparams = {0};
 	fsparams.fs_texture = &render_target;
-	fsparams.fs_texture_mip_level = 4;
+	fsparams.fs_texture_highest_mip_level = 0;
+	fsparams.fs_texture_mip_count = 5;
 	fsparams.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &fsparams, &set);
 
 	for (int i = 0; i < 4; ++i) {
 		mip_parameters cparams = {0};
 		cparams.mip_source_texture = &render_target;
-		cparams.mip_source_texture_mip_level = i;
+		cparams.mip_source_texture_highest_mip_level = i;
+		cparams.mip_source_texture_mip_count = 1;
 		cparams.mip_destination_texture = &render_target;
 		cparams.mip_destination_texture_mip_level = i + 1;
 		kong_create_mip_set(&device, &cparams, &mip_sets[i]);
