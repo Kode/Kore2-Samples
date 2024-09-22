@@ -14,6 +14,7 @@ static kope_g5_command_list list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_buffer image_buffer;
+static kope_g5_buffer image_buffer2;
 static kope_g5_texture texture;
 static kope_g5_sampler sampler;
 static kope_g5_buffer constants;
@@ -29,15 +30,31 @@ static void update(void *data) {
 	constants_type_buffer_unlock(&constants);
 
 	if (first_update) {
-		kope_g5_image_copy_buffer source = {0};
-		source.buffer = &image_buffer;
-		source.bytes_per_row = 250 * 4;
+		{
+			kope_g5_image_copy_buffer source = {0};
+			source.buffer = &image_buffer;
+			source.bytes_per_row = 250 * 4;
 
-		kope_g5_image_copy_texture destination = {0};
-		destination.texture = &texture;
-		destination.mip_level = 0;
+			kope_g5_image_copy_texture destination = {0};
+			destination.texture = &texture;
+			destination.mip_level = 0;
 
-		kope_g5_command_list_copy_buffer_to_texture(&list, &source, &destination, 250, 250, 1);
+			kope_g5_command_list_copy_buffer_to_texture(&list, &source, &destination, 250, 250, 1);
+		}
+
+		{
+			kope_g5_image_copy_buffer source = {0};
+			source.buffer = &image_buffer2;
+			source.bytes_per_row = 250 * 4;
+
+			kope_g5_image_copy_texture destination = {0};
+			destination.texture = &texture;
+			destination.mip_level = 0;
+			destination.origin_z = 1;
+
+			kope_g5_command_list_copy_buffer_to_texture(&list, &source, &destination, 250, 250, 1);
+		}
+
 		first_update = false;
 	}
 
@@ -83,20 +100,34 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_command_list(&device, &list);
 
-	kope_g5_buffer_parameters buffer_parameters;
-	buffer_parameters.size = 250 * 250 * 4;
-	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
-	kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
+	{
+		kope_g5_buffer_parameters buffer_parameters;
+		buffer_parameters.size = 250 * 250 * 4;
+		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
-	kinc_image_t image;
-	kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer), "parrot.png");
-	kinc_image_destroy(&image);
-	kope_g5_buffer_unlock(&image_buffer);
+		kinc_image_t image;
+		kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer), "parrot.png");
+		kinc_image_destroy(&image);
+		kope_g5_buffer_unlock(&image_buffer);
+	}
+
+	{
+		kope_g5_buffer_parameters buffer_parameters;
+		buffer_parameters.size = 250 * 250 * 4;
+		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
+		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer2);
+
+		kinc_image_t image;
+		kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer2), "parrot2.png");
+		kinc_image_destroy(&image);
+		kope_g5_buffer_unlock(&image_buffer2);
+	}
 
 	kope_g5_texture_parameters texture_parameters;
 	texture_parameters.width = 250;
 	texture_parameters.height = 250;
-	texture_parameters.depth_or_array_layers = 1;
+	texture_parameters.depth_or_array_layers = 2;
 	texture_parameters.mip_level_count = 1;
 	texture_parameters.sample_count = 1;
 	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
