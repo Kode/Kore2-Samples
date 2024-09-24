@@ -16,8 +16,8 @@ static kope_g5_command_list list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 
-const int width = 1024;
-const int height = 768;
+const int width = 800;
+const int height = 600;
 
 static void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
