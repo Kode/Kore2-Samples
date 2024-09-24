@@ -283,6 +283,12 @@ ${postfixSteps}
     - name: Check ${sample}
       working-directory: ${sample}
       run: magick compare -metric mae .\\reference.png .\\Deployment\\test.png difference.png
+    - name: Upload  ${sample} failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${sample} image
+        path: ${sample}/Deployment/test.png
 `;
     if (workflow.env) {
       workflowText += workflow.env;
