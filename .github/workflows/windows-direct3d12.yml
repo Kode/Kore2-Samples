@@ -27,6 +27,14 @@ jobs:
     - name: Dir
       working-directory: Shader
       run: dir Deployment
+    - uses: actions/upload-artifact@v4
+      with:
+        name: crashdump
+        path: Shader/Deployment/kinc.dmp
+    - uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: Shader/build/x64/Release/
     - name: Check Shader
       working-directory: Shader
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
