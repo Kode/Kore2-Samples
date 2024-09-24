@@ -8,6 +8,7 @@ project.setDebugDir('Deployment');
 
 if (Options.screenshot) {
 	project.addDefine('SCREENSHOT');
+	project.addDefine('KOPE_D3D12_FORCE_WARP');
 }
 
 project.flatten();
