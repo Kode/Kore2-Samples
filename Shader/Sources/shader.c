@@ -7,10 +7,17 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#ifdef SCREENSHOT
+#include "../../screenshot.h"
+#endif
+
 static kope_g5_device device;
 static kope_g5_command_list list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
+
+const int width = 1024;
+const int height = 768;
 
 static void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
@@ -40,10 +47,14 @@ static void update(void *data) {
 	kope_g5_command_list_present(&list);
 
 	kope_g5_device_execute_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_take(&device, &list, framebuffer, width, height);
+#endif
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -52,6 +63,10 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 	kope_g5_device_create_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_init_buffer(&device, width, height);
+#endif
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
