@@ -99,6 +99,8 @@ int kickstart(int argc, char **argv) {
 
 	fs_parameters set_parameters = {0};
 	set_parameters.fs_texture = &target_depth;
+	set_parameters.fs_texture_highest_mip_level = 0;
+	set_parameters.fs_texture_mip_count = 1;
 	set_parameters.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &set_parameters, &set);
 
