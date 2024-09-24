@@ -25,6 +25,7 @@ jobs:
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --run
       continue-on-error: true
     - name: Dir
+      working-directory: Shader
       run: dir Deployment
     - name: Check Shader
       working-directory: Shader
