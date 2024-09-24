@@ -251,10 +251,6 @@ ${java}
 ${steps}
     - name: Get Submodules
       run: ./get_dlc
-    - name: Get ImageMagick
-      run: |
-        choco install -y imagemagick.app --no-progress
-        Get-ChildItem -Path \"\${env:ProgramFiles}\" | Where-Object {($_.Name -Like 'ImageMagick*')} | % { $_.FullName } | Out-File -Append -FilePath $env:GITHUB_PATH -Encoding utf8
 ${postfixSteps}
 `;
 
