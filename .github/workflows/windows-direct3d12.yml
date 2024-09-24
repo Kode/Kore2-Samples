@@ -34,7 +34,7 @@ jobs:
     - uses: actions/upload-artifact@v4
       with:
         name: build
-        path: Shader/build/x64/Release/
+        path: Shader/build/x64/Debug/
     - name: Check Shader
       working-directory: Shader
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
