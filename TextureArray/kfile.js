@@ -6,6 +6,10 @@ project.addFile('Sources/**');
 project.addKongDir('Shaders');
 project.setDebugDir('Deployment');
 
+if (Options.screenshot) {
+	project.addDefine('SCREENSHOT');
+}
+
 project.flatten();
 
 resolve(project);
