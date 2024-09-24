@@ -246,7 +246,7 @@ jobs:
     runs-on: ${workflow.runsOn}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 ${java}
 ${steps}
     - name: Get Submodules
@@ -279,7 +279,7 @@ ${postfixSteps}
     workflowText +=
 `    - name: Compile ${sample}
       working-directory: ${sample}
-      run: ${prefix}../Kinc/make ${sys}${vs}${gfx}${options} --option screenshot --run${postfix}
+      run: ${prefix}../Kinc/make ${sys}${vs}${gfx}${options} --option screenshot --debug --run${postfix}
     - name: Check ${sample}
       working-directory: ${sample}
       run: magick compare -metric mae .\\reference.png .\\Deployment\\test.png difference.png
