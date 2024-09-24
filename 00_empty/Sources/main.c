@@ -1,34 +1,47 @@
-#include <kinc/graphics4/graphics.h>
 #include <kinc/io/filereader.h>
 #include <kinc/system.h>
+#include <kope/graphics5/device.h>
+
+#include <kong.h>
 
 #include <assert.h>
 #include <stdlib.h>
 
-#define HEAP_SIZE 1024 * 1024
-static uint8_t *heap = NULL;
-static size_t heap_top = 0;
-
-static void *allocate(size_t size) {
-	size_t old_top = heap_top;
-	heap_top += size;
-	assert(heap_top <= HEAP_SIZE);
-	return &heap[old_top];
-}
+static kope_g5_device device;
+static kope_g5_command_list list;
 
 static void update(void *data) {
-	kinc_g4_begin(0);
-	kinc_g4_clear(KINC_G4_CLEAR_COLOR, 0, 0.0f, 0);
-	kinc_g4_end(0);
-	kinc_g4_swap_buffers();
+	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
+
+	kope_g5_render_pass_parameters parameters = {0};
+	parameters.color_attachments_count = 1;
+	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+	kope_g5_color clear_color;
+	clear_color.r = 0.0f;
+	clear_color.g = 0.0f;
+	clear_color.b = 0.0f;
+	clear_color.a = 1.0f;
+	parameters.color_attachments[0].clear_value = clear_color;
+	parameters.color_attachments[0].texture = framebuffer;
+	kope_g5_command_list_begin_render_pass(&list, &parameters);
+
+	kope_g5_command_list_end_render_pass(&list);
+
+	kope_g5_command_list_present(&list);
+
+	kope_g5_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
 	kinc_init("Example", 1024, 768, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
-	heap = (uint8_t *)malloc(HEAP_SIZE);
-	assert(heap != NULL);
+	kope_g5_device_wishlist wishlist = {0};
+	kope_g5_device_create(&device, &wishlist);
+
+	kong_init(&device);
+
+	kope_g5_device_create_command_list(&device, &list);
 
 	kinc_start();
 
