@@ -23,6 +23,8 @@ jobs:
     - name: Compile Shader
       working-directory: Shader
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --run
+    - name: Dir
+      run: dir Deployment
     - name: Check Shader
       working-directory: Shader
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
