@@ -196,17 +196,22 @@ static void update(void *data) {
 	constants_type_buffer_unlock(&constants);
 
 	if (first_update) {
-		kope_uint3 size;
-		size.x = 512;
-		size.y = 512;
-		size.z = 1;
-		kope_g5_command_list_copy_buffer_to_texture(&list, &image_buffer, &texture, size);
+		kope_g5_image_copy_buffer source = {0};
+		source.buffer = &image_buffer;
+		source.bytes_per_row = 512 * 4;
+
+		kope_g5_image_copy_texture destination = {0};
+		destination.texture = &texture;
+
+		kope_g5_command_list_copy_buffer_to_texture(&list, &source, &destination, 512, 512, 1);
+
 		first_update = false;
 	}
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
 	kope_g5_render_pass_parameters parameters = {0};
+	parameters.color_attachments_count = 1;
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
 	clear_color.r = 0.0f;
@@ -217,7 +222,7 @@ static void update(void *data) {
 	parameters.color_attachments[0].texture = framebuffer;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
-	kong_set_pipeline(&list, &pipeline);
+	kong_set_render_pipeline(&list, &pipeline);
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
@@ -311,6 +316,8 @@ int kickstart(int argc, char **argv) {
 		everything_parameters parameters;
 		parameters.constants = &constants;
 		parameters.pix_texture = &texture;
+		parameters.pix_texture_highest_mip_level = 0;
+		parameters.pix_texture_mip_count = 1;
 		parameters.pix_sampler = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}

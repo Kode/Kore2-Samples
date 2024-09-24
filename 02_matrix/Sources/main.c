@@ -109,6 +109,7 @@ static void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
 	kope_g5_render_pass_parameters parameters = {0};
+	parameters.color_attachments_count = 1;
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
 	clear_color.r = 0.0f;
@@ -119,7 +120,7 @@ static void update(void *data) {
 	parameters.color_attachments[0].texture = framebuffer;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
-	kong_set_pipeline(&list, &pipeline);
+	kong_set_render_pipeline(&list, &pipeline);
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
