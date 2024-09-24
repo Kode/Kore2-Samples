@@ -32,7 +32,6 @@ static void update(void *data) {
 		parameters.color_attachments[i].texture = &render_targets[i];
 	}
 	parameters.color_attachments_count = 4;
-	parameters.depth_stencil_attachments_count = 0;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);

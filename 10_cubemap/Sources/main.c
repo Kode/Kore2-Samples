@@ -153,6 +153,8 @@ int kickstart(int argc, char **argv) {
 
 	fs_parameters fs_params = {0};
 	fs_params.fs_texture = &render_target;
+	fs_params.fs_texture_highest_mip_level = 0;
+	fs_params.fs_texture_mip_count = 1;
 	fs_params.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &fs_params, &set);
 

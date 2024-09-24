@@ -136,7 +136,10 @@ int kickstart(int argc, char **argv) {
 
 	compute_parameters cparams = {0};
 	cparams.copy_source_texture = &float_render_target;
+	cparams.copy_source_texture_highest_mip_level = 0;
+	cparams.copy_source_texture_mip_count = 1;
 	cparams.copy_destination_texture = &render_target;
+	cparams.copy_destination_texture_mip_level = 0;
 	kong_create_compute_set(&device, &cparams, &set);
 
 	kinc_start();
