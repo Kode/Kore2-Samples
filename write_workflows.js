@@ -3,12 +3,11 @@ const path = require('path');
 
 const samples = [
 	'Shader',
-	/*'Texture',
-	'MultiWindow',
+	'Texture',
+	//'MultiWindow',
 	'ComputeShader',
 	'TextureArray',
-	'ShaderG5',
-  'RuntimeShaderCompilation',*/
+  //'RuntimeShaderCompilation',
   '00_empty',
   '01_triangle',
   '02_matrix',
@@ -20,11 +19,11 @@ const samples = [
   '08_float_render_targets',
   '09_depth_render_targets',
   '10_cubemap',
-  /*'11_instanced_rendering',
+  '11_instanced_rendering',
   '12_set_render_target_depth',
   '13_generate_mipmaps',
   '14_set_mipmap',
-  '15_deinterleaved_buffers'*/
+  '15_deinterleaved_buffers'
 ];
 
 const workflowsDir = path.join('.github', 'workflows');
@@ -292,18 +291,18 @@ ${postfixSteps}
 }
 
 const workflows = [
-  {
+  /*{
     sys: 'Android',
     gfx: 'OpenGL',
     runsOn: 'ubuntu-latest',
     java: true
   },
-  /*{
+  {
     sys: 'Android',
     gfx: 'Vulkan',
     runsOn: 'ubuntu-latest',
     java: true
-  },*/
+  },
   {
     sys: 'Emscripten',
     gfx: 'WebGL',
@@ -330,11 +329,11 @@ const workflows = [
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
 `
   },
-  /*{
+  {
     sys: 'FreeBSD',
     gfx: 'OpenGL',
     runsOn: 'macos-12'
-  },*/
+  },
   {
     sys: 'iOS',
     gfx: 'Metal',
@@ -365,7 +364,7 @@ const workflows = [
 `,
     RuntimeShaderCompilation: true
   },
-  /*{
+  {
     sys: 'Linux',
     gfx: 'Vulkan',
     runsOn: 'ubuntu-latest',
@@ -379,7 +378,7 @@ const workflows = [
     - name: Apt Install
       run: sudo apt install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev vulkan-sdk libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `
-  },*/
+  },
   {
     sys: 'macOS',
     gfx: 'Metal',
@@ -413,19 +412,19 @@ const workflows = [
     runsOn: 'windows-latest',
     RuntimeShaderCompilation: true,
     vs: 'vs2022'
-  },
+  },*/
   {
     sys: 'Windows',
     gfx: 'Direct3D 12',
     runsOn: 'windows-latest',
     vs: 'vs2022'
-  },
+  }/*,
   {
     sys: 'Windows',
     gfx: 'OpenGL',
     runsOn: 'windows-latest',
     vs: 'vs2022'
-  }/*,
+  },
   {
     sys: 'Windows',
     gfx: 'Vulkan',
