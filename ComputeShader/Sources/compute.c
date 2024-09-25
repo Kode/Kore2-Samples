@@ -6,6 +6,10 @@
 
 #include <assert.h>
 
+#ifdef SCREENSHOT
+#include "../../screenshot.h"
+#endif
+
 static kope_g5_device device;
 static kope_g5_command_list list;
 static vertex_in_buffer vertices;
@@ -18,8 +22,8 @@ static everything_set everything;
 static compute_set compute;
 static kope_g5_buffer image_buffer;
 
-#define WIDTH 1024
-#define HEIGHT 768
+static const int width = 800;
+static const int height = 600;
 
 void update(void *data) {
 	constants_type *constants_data = constants_type_buffer_lock(&constants);
@@ -64,10 +68,14 @@ void update(void *data) {
 	kope_g5_command_list_present(&list);
 
 	kope_g5_device_execute_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_take(&device, &list, framebuffer, width, height);
+#endif
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Compute", 1024, 768, NULL, NULL);
+	kinc_init("Compute", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -100,6 +108,10 @@ int kickstart(int argc, char **argv) {
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
 	kope_g5_device_create_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_init_buffer(&device, width, height);
+#endif
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
