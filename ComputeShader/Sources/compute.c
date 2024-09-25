@@ -38,6 +38,7 @@ void update(void *data) {
 	kope_g5_command_list_compute(&list, 256 / 16, 256 / 16, 1);
 
 	kope_g5_render_pass_parameters parameters = {0};
+	parameters.color_attachments_count = 1;
 	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
 	clear_color.r = 0.0f;
@@ -139,6 +140,8 @@ int kickstart(int argc, char **argv) {
 		everything_parameters parameters;
 		parameters.constants = &constants;
 		parameters.comp_texture = &texture;
+		parameters.comp_texture_highest_mip_level = 0;
+		parameters.comp_texture_mip_count = 1;
 		parameters.comp_sampler = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
@@ -149,6 +152,7 @@ int kickstart(int argc, char **argv) {
 		compute_parameters parameters;
 		parameters.compute_constants = &compute_constants;
 		parameters.dest_texture = &texture;
+		parameters.dest_texture_mip_level = 0;
 		kong_create_compute_set(&device, &parameters, &compute);
 	}
 
