@@ -46,7 +46,7 @@ static void update(void *data) {
 	if (first_update) {
 		kope_g5_image_copy_buffer source = {0};
 		source.buffer = &image_buffer;
-		source.bytes_per_row = 250 * 4;
+		source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, 250 * 4);
 
 		kope_g5_image_copy_texture destination = {0};
 		destination.texture = &texture;
@@ -107,14 +107,28 @@ int kickstart(int argc, char **argv) {
 #endif
 
 	kope_g5_buffer_parameters buffer_parameters;
-	buffer_parameters.size = 250 * 250 * 4;
+	buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) * 250;
 	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
+	// kinc_image can not load images with row-alignment directly because stb_image doesn't support that :-(
+	uint32_t *image_data = (uint32_t *)malloc(250 * 4 * 250);
+	assert(image_data != NULL);
+
 	kinc_image_t image;
-	kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer), "parrot.png");
+	kinc_image_init_from_file(&image, image_data, "parrot.png");
 	kinc_image_destroy(&image);
+
+	uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
+	uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock(&image_buffer);
+	for (int y = 0; y < 250; ++y) {
+		for (int x = 0; x < 250; ++x) {
+			gpu_image_data[y * stride + x] = image_data[y * 250 + x];
+		}
+	}
 	kope_g5_buffer_unlock(&image_buffer);
+
+	free(image_data);
 
 	kope_g5_texture_parameters texture_parameters;
 	texture_parameters.width = 250;
