@@ -9,6 +9,10 @@
 #include <assert.h>
 #include <stdlib.h>
 
+#ifdef SCREENSHOT
+#include "../../screenshot.h"
+#endif
+
 static kope_g5_device device;
 static kope_g5_command_list list;
 static vertex_in_buffer vertices;
@@ -19,10 +23,21 @@ static kope_g5_sampler sampler;
 static kope_g5_buffer constants;
 static everything_set everything;
 
+static const int width = 800;
+static const int height = 600;
+
 static bool first_update = true;
 
+static float time(void) {
+#ifdef SCREENSHOT
+	return 0.3f;
+#else
+	return (float)kinc_time();
+#endif
+}
+
 static void update(void *data) {
-	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z((float)kinc_time());
+	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(time());
 
 	constants_type *constants_data = constants_type_buffer_lock(&constants);
 	constants_data->mvp = matrix;
@@ -70,10 +85,14 @@ static void update(void *data) {
 	kope_g5_command_list_present(&list);
 
 	kope_g5_device_execute_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_take(&device, &list, framebuffer, width, height);
+#endif
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -82,6 +101,10 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 	kope_g5_device_create_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_init_buffer(&device, width, height);
+#endif
 
 	kope_g5_buffer_parameters buffer_parameters;
 	buffer_parameters.size = 250 * 250 * 4;
