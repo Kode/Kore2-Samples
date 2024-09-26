@@ -166,9 +166,10 @@ int kickstart(int argc, char **argv) {
 	kope_g5_device_create_raytracing_hierarchy(&device, volumes, transforms, 3, &hierarchy);
 
 	{
-		rayset_parameters parameters;
+		rayset_parameters parameters = {0};
 		parameters.scene = &hierarchy;
 		parameters.render_target = &texture;
+		parameters.render_target_mip_level = 0;
 		kong_create_rayset_set(&device, &parameters, &rayset);
 	}
 
