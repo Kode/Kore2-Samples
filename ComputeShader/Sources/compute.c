@@ -147,9 +147,10 @@ int kickstart(int argc, char **argv) {
 	{
 		everything_parameters parameters;
 		parameters.constants = &constants;
-		parameters.comp_texture = &texture;
-		parameters.comp_texture_highest_mip_level = 0;
-		parameters.comp_texture_mip_count = 1;
+		parameters.comp_texture.texture = &texture;
+		parameters.comp_texture.base_mip_level = 0;
+		parameters.comp_texture.mip_level_count = 1;
+		parameters.comp_texture.array_layer_count = 1;
 		parameters.comp_sampler = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
@@ -159,8 +160,10 @@ int kickstart(int argc, char **argv) {
 	{
 		compute_parameters parameters;
 		parameters.compute_constants = &compute_constants;
-		parameters.dest_texture = &texture;
-		parameters.dest_texture_mip_level = 0;
+		parameters.dest_texture.texture = &texture;
+		parameters.dest_texture.base_mip_level = 0;
+		parameters.dest_texture.mip_level_count = 1;
+		parameters.dest_texture.array_layer_count = 1;
 		kong_create_compute_set(&device, &parameters, &compute);
 	}
 

@@ -191,11 +191,12 @@ int kickstart(int argc, char **argv) {
 	constants_type_buffer_create(&device, &constants);
 
 	{
-		everything_parameters parameters;
+		everything_parameters parameters = {0};
 		parameters.constants = &constants;
-		parameters.tex = &texture;
-		parameters.tex_highest_mip_level = 0;
-		parameters.tex_mip_count = 1;
+		parameters.tex.texture = &texture;
+		parameters.tex.base_mip_level = 0;
+		parameters.tex.mip_level_count = 1;
+		parameters.tex.array_layer_count = 1;
 		parameters.sam = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
