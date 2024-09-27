@@ -23,6 +23,9 @@ static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_texture render_targets[4];
 
+static const int width = 800;
+static const int height = 600;
+
 static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};
 	for (uint32_t i = 0; i < 4; ++i) {
@@ -66,25 +69,25 @@ static void update(void *data) {
 	source.origin_y = 0;
 	source.origin_z = 0;
 
-	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
-	destination.origin_x = 512;
+	destination.origin_x = width / 2;
 	destination.origin_y = 0;
 	source.texture = &render_targets[1];
 
-	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
 	destination.origin_x = 0;
-	destination.origin_y = 384;
+	destination.origin_y = height / 2;
 	source.texture = &render_targets[2];
 
-	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
-	destination.origin_x = 512;
-	destination.origin_y = 384;
+	destination.origin_x = width / 2;
+	destination.origin_y = height / 2;
 	source.texture = &render_targets[3];
 
-	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, 512, 384, 1);
+	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
 	kope_g5_command_list_present(&list);
 
@@ -96,7 +99,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -108,8 +111,8 @@ int kickstart(int argc, char **argv) {
 
 	for (uint32_t i = 0; i < 4; ++i) {
 		kope_g5_texture_parameters texture_parameters;
-		texture_parameters.width = 512;
-		texture_parameters.height = 384;
+		texture_parameters.width = width / 2;
+		texture_parameters.height = height / 2;
 		texture_parameters.depth_or_array_layers = 1;
 		texture_parameters.mip_level_count = 1;
 		texture_parameters.sample_count = 1;

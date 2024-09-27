@@ -18,8 +18,8 @@ static kope_g5_texture float_render_target;
 static kope_g5_texture render_target; // intermediate target because D3D12 doesn't seem to like uav framebuffer access
 static compute_set set;
 
-const static int width = 1024;
-const static int height = 768;
+const static int width = 800;
+const static int height = 600;
 
 static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};
@@ -143,11 +143,16 @@ int kickstart(int argc, char **argv) {
 	}
 
 	compute_parameters cparams = {0};
-	cparams.copy_source_texture = &float_render_target;
-	cparams.copy_source_texture_highest_mip_level = 0;
-	cparams.copy_source_texture_mip_count = 1;
-	cparams.copy_destination_texture = &render_target;
-	cparams.copy_destination_texture_mip_level = 0;
+	cparams.copy_source_texture.texture = &float_render_target;
+	cparams.copy_source_texture.base_mip_level = 0;
+	cparams.copy_source_texture.mip_level_count = 1;
+	cparams.copy_source_texture.base_array_layer = 0;
+	cparams.copy_source_texture.array_layer_count = 1;
+	cparams.copy_destination_texture.texture = &render_target;
+	cparams.copy_destination_texture.base_mip_level = 0;
+	cparams.copy_destination_texture.mip_level_count = 1;
+	cparams.copy_destination_texture.base_array_layer = 0;
+	cparams.copy_destination_texture.array_layer_count = 1;
 	kong_create_compute_set(&device, &cparams, &set);
 
 	kinc_start();

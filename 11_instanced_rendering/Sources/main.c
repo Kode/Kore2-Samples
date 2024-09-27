@@ -17,6 +17,9 @@ static vertex_in_buffer vertices;
 static vertex_offset_in_buffer vertices_inst;
 static kope_g5_buffer indices;
 
+static const int width = 800;
+static const int height = 600;
+
 static void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
@@ -54,7 +57,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};

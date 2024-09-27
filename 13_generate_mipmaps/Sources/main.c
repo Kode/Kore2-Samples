@@ -20,6 +20,9 @@ static kope_g5_sampler sampler;
 static fs_set set;
 static mip_set mip_sets[4];
 
+static const int width = 800;
+static const int height = 600;
+
 static void update(void *data) {
 	{
 		kope_g5_render_pass_parameters parameters = {0};
@@ -100,7 +103,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -176,19 +179,26 @@ int kickstart(int argc, char **argv) {
 	}
 
 	fs_parameters fsparams = {0};
-	fsparams.fs_texture = &render_target;
-	fsparams.fs_texture_highest_mip_level = 0;
-	fsparams.fs_texture_mip_count = 5;
+	fsparams.fs_texture.texture = &render_target;
+	fsparams.fs_texture.base_mip_level = 0;
+	fsparams.fs_texture.mip_level_count = 5;
+	fsparams.fs_texture.base_array_layer = 0;
+	fsparams.fs_texture.array_layer_count = 1;
 	fsparams.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &fsparams, &set);
 
 	for (int i = 0; i < 4; ++i) {
 		mip_parameters cparams = {0};
-		cparams.mip_source_texture = &render_target;
-		cparams.mip_source_texture_highest_mip_level = i;
-		cparams.mip_source_texture_mip_count = 1;
-		cparams.mip_destination_texture = &render_target;
-		cparams.mip_destination_texture_mip_level = i + 1;
+		cparams.mip_source_texture.texture = &render_target;
+		cparams.mip_source_texture.base_mip_level = i;
+		cparams.mip_source_texture.mip_level_count = 1;
+		cparams.mip_source_texture.base_array_layer = 0;
+		cparams.mip_source_texture.array_layer_count = 1;
+		cparams.mip_destination_texture.texture = &render_target;
+		cparams.mip_destination_texture.base_mip_level = i + 1;
+		cparams.mip_destination_texture.mip_level_count = 1;
+		cparams.mip_destination_texture.base_array_layer = 0;
+		cparams.mip_destination_texture.array_layer_count = 1;
 		kong_create_mip_set(&device, &cparams, &mip_sets[i]);
 	}
 

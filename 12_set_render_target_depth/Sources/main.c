@@ -20,8 +20,8 @@ static kope_g5_texture target_depth;
 static kope_g5_sampler sampler;
 static fs_set set;
 
-static const int width = 1024;
-static const int height = 768;
+static const int width = 800;
+static const int height = 600;
 
 static void update(void *data) {
 	{
@@ -106,9 +106,11 @@ int kickstart(int argc, char **argv) {
 	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
 
 	fs_parameters set_parameters = {0};
-	set_parameters.fs_texture = &target_depth;
-	set_parameters.fs_texture_highest_mip_level = 0;
-	set_parameters.fs_texture_mip_count = 1;
+	set_parameters.fs_texture.texture = &target_depth;
+	set_parameters.fs_texture.base_mip_level = 0;
+	set_parameters.fs_texture.mip_level_count = 1;
+	set_parameters.fs_texture.base_array_layer = 0;
+	set_parameters.fs_texture.array_layer_count = 1;
 	set_parameters.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &set_parameters, &set);
 

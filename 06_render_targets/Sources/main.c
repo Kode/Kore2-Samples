@@ -16,8 +16,8 @@ static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_texture render_target;
 
-static const uint32_t width = 1024;
-static const uint32_t height = 768;
+static const uint32_t width = 800;
+static const uint32_t height = 600;
 
 static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};

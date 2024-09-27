@@ -21,13 +21,16 @@ static fs_set set;
 static kope_g5_buffer image_buffer0;
 static kope_g5_buffer image_buffer1;
 
+static const int width = 800;
+static const int height = 600;
+
 static bool first = true;
 
 static void update(void *data) {
 	if (first) {
 		{
 			kope_g5_image_copy_buffer source = {0};
-			source.bytes_per_row = 512 * 4;
+			source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, 512 * 4);
 			source.buffer = &image_buffer0;
 
 			kope_g5_image_copy_texture destination = {0};
@@ -39,7 +42,7 @@ static void update(void *data) {
 
 		{
 			kope_g5_image_copy_buffer source = {0};
-			source.bytes_per_row = 256 * 4;
+			source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, 256 * 4);
 			source.buffer = &image_buffer1;
 
 			kope_g5_image_copy_texture destination = {0};
@@ -90,7 +93,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -102,25 +105,49 @@ int kickstart(int argc, char **argv) {
 
 	{
 		kope_g5_buffer_parameters buffer_parameters;
-		buffer_parameters.size = 512 * 512 * 4;
+		buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 512 * 4) * 512;
 		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer0);
 
+		// kinc_image can not load images with row-alignment directly because stb_image doesn't support that :-(
+		uint32_t *image_data = (uint32_t *)malloc(512 * 4 * 512);
+		assert(image_data != NULL);
+
 		kinc_image_t image;
-		kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer0), "uvtemplate.png");
+		kinc_image_init_from_file(&image, image_data, "uvtemplate.png");
 		kinc_image_destroy(&image);
+
+		uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 512 * 4) / 4;
+		uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock(&image_buffer0);
+		for (int y = 0; y < 512; ++y) {
+			for (int x = 0; x < 512; ++x) {
+				gpu_image_data[y * stride + x] = image_data[y * 512 + x];
+			}
+		}
 		kope_g5_buffer_unlock(&image_buffer0);
 	}
 
 	{
 		kope_g5_buffer_parameters buffer_parameters;
-		buffer_parameters.size = 256 * 256 * 4;
+		buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 256 * 4) * 256;
 		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer1);
 
+		// kinc_image can not load images with row-alignment directly because stb_image doesn't support that :-(
+		uint32_t *image_data = (uint32_t *)malloc(256 * 4 * 256);
+		assert(image_data != NULL);
+
 		kinc_image_t image;
-		kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer1), "uvtemplate2.png");
+		kinc_image_init_from_file(&image, image_data, "uvtemplate2.png");
 		kinc_image_destroy(&image);
+
+		uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 256 * 4) / 4;
+		uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock(&image_buffer1);
+		for (int y = 0; y < 256; ++y) {
+			for (int x = 0; x < 256; ++x) {
+				gpu_image_data[y * stride + x] = image_data[y * 256 + x];
+			}
+		}
 		kope_g5_buffer_unlock(&image_buffer1);
 	}
 
@@ -171,9 +198,11 @@ int kickstart(int argc, char **argv) {
 	}
 
 	fs_parameters fsparams = {0};
-	fsparams.fs_texture = &texture;
-	fsparams.fs_texture_highest_mip_level = 0;
-	fsparams.fs_texture_mip_count = 2;
+	fsparams.fs_texture.texture = &texture;
+	fsparams.fs_texture.base_mip_level = 0;
+	fsparams.fs_texture.mip_level_count = 2;
+	fsparams.fs_texture.base_array_layer = 0;
+	fsparams.fs_texture.array_layer_count = 1;
 	fsparams.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &fsparams, &set);
 
