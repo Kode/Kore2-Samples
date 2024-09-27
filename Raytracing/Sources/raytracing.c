@@ -102,6 +102,10 @@ void update(void *data) {
 	kope_g5_command_list_present(&list);
 
 	kope_g5_device_execute_command_list(&device, &list);
+
+#ifdef SCREENSHOT
+	screenshot_take(&device, &list, framebuffer, width, height);
+#endif
 }
 
 int kickstart(int argc, char **argv) {
