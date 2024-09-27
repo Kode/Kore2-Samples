@@ -102,10 +102,6 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_command_list(&device, &list);
 
-#ifdef SCREENSHOT
-	screenshot_init_buffer(&device, width, height);
-#endif
-
 	kope_g5_buffer_parameters buffer_parameters;
 	buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) * 250;
 	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;

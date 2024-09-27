@@ -109,10 +109,6 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_command_list(&device, &list);
 
-#ifdef SCREENSHOT
-	screenshot_init_buffer(&device, width, height);
-#endif
-
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
 		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
