@@ -29,8 +29,16 @@ static const int height = 600;
 
 static bool first_update = true;
 
+static float time(void) {
+#ifdef SCREENSHOT
+	return 0.3f;
+#else
+	return (float)kinc_time();
+#endif
+}
+
 static void update(void *data) {
-	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z((float)kinc_time());
+	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(time());
 
 	constants_type *constants_data = constants_type_buffer_lock(&constants);
 	constants_data->mvp = matrix;
@@ -146,7 +154,7 @@ int kickstart(int argc, char **argv) {
 		assert(image_data != NULL);
 
 		kinc_image_t image;
-		kinc_image_init_from_file(&image, image_data, "parrot.png");
+		kinc_image_init_from_file(&image, image_data, "parrot2.png");
 		kinc_image_destroy(&image);
 
 		uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
@@ -229,7 +237,8 @@ int kickstart(int argc, char **argv) {
 		parameters.tex.texture = &texture;
 		parameters.tex.base_mip_level = 0;
 		parameters.tex.mip_level_count = 1;
-		parameters.tex.array_layer_count = 1;
+		parameters.tex.base_array_layer = 0;
+		parameters.tex.array_layer_count = 2;
 		parameters.sam = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
