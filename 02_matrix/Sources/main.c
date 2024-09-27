@@ -20,6 +20,9 @@ static kope_g5_buffer indices;
 static kope_g5_buffer constants;
 static everything_set everything;
 
+static const int width = 800;
+static const int height = 600;
+
 float vec4_length(kinc_vector3_t a) {
 	return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
 }
@@ -146,7 +149,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};

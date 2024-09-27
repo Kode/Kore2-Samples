@@ -23,6 +23,9 @@ static everything_set everything;
 
 static uint32_t vertex_count;
 
+static const int width = 800;
+static const int height = 600;
+
 /* clang-format off */
 static float vertices_data[] = {
     -1.0,-1.0,-1.0,
@@ -229,7 +232,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};

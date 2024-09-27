@@ -27,6 +27,9 @@ static kope_g5_buffer image_buffer;
 
 static uint32_t vertex_count;
 
+static const int width = 800;
+static const int height = 600;
+
 /* clang-format off */
 static float vertices_data[] = {
     -1.0,-1.0,-1.0,
@@ -248,7 +251,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", 1024, 768, NULL, NULL);
+	kinc_init("Example", width, height, NULL, NULL);
 	kinc_set_update_callback(update, NULL);
 
 	kope_g5_device_wishlist wishlist = {0};
@@ -323,9 +326,11 @@ int kickstart(int argc, char **argv) {
 	{
 		everything_parameters parameters;
 		parameters.constants = &constants;
-		parameters.pix_texture = &texture;
-		parameters.pix_texture_highest_mip_level = 0;
-		parameters.pix_texture_mip_count = 1;
+		parameters.pix_texture.texture = &texture;
+		parameters.pix_texture.base_mip_level = 0;
+		parameters.pix_texture.mip_level_count = 1;
+		parameters.pix_texture.base_array_layer = 0;
+		parameters.pix_texture.array_layer_count = 1;
 		parameters.pix_sampler = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
