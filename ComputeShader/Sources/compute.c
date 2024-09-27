@@ -145,7 +145,7 @@ int kickstart(int argc, char **argv) {
 	constants_type_buffer_create(&device, &constants);
 
 	{
-		everything_parameters parameters;
+		everything_parameters parameters = {0};
 		parameters.constants = &constants;
 		parameters.comp_texture.texture = &texture;
 		parameters.comp_texture.base_mip_level = 0;
@@ -158,7 +158,7 @@ int kickstart(int argc, char **argv) {
 	compute_constants_type_buffer_create(&device, &compute_constants);
 
 	{
-		compute_parameters parameters;
+		compute_parameters parameters = {0};
 		parameters.compute_constants = &compute_constants;
 		parameters.dest_texture.texture = &texture;
 		parameters.dest_texture.base_mip_level = 0;
