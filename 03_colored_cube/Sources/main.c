@@ -20,6 +20,7 @@ static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_buffer constants;
 static everything_set everything;
+static kope_g5_texture depth;
 
 static uint32_t vertex_count;
 
@@ -208,6 +209,9 @@ static void update(void *data) {
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
 	parameters.color_attachments[0].texture = framebuffer;
+	parameters.depth_stencil_attachment.texture = &depth;
+	parameters.depth_stencil_attachment.depth_clear_value = 1.0f;
+	parameters.depth_stencil_attachment.depth_load_op = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -242,7 +246,19 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_command_list(&device, &list);
 
+	kope_g5_texture_parameters texture_params = {0};
+	texture_params.format = KOPE_G5_TEXTURE_FORMAT_DEPTH32FLOAT;
+	texture_params.width = width;
+	texture_params.height = height;
+	texture_params.depth_or_array_layers = 1;
+	texture_params.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_params.mip_level_count = 1;
+	texture_params.sample_count = 1;
+	texture_params.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
+	kope_g5_device_create_texture(&device, &texture_params, &depth);
+
 	vertex_count = sizeof(vertices_data) / 3 / 4;
+
 	kong_create_buffer_vertex_in(&device, vertex_count, &vertices);
 	{
 		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);

@@ -26,6 +26,7 @@ static kope_g5_texture texture;
 static kope_g5_sampler sampler;
 static everything_set everything;
 static kope_g5_buffer image_buffer;
+static kope_g5_texture depth;
 
 static uint32_t vertex_count;
 
@@ -318,6 +319,9 @@ static void update(void *data) {
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
 	parameters.color_attachments[0].texture = framebuffer;
+	parameters.depth_stencil_attachment.texture = &depth;
+	parameters.depth_stencil_attachment.depth_load_op = KOPE_G5_LOAD_OP_CLEAR;
+	parameters.depth_stencil_attachment.depth_clear_value = 1.0f;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -365,16 +369,31 @@ int kickstart(int argc, char **argv) {
 	kinc_image_destroy(&image);
 	kope_g5_buffer_unlock(&image_buffer);
 
-	kope_g5_texture_parameters texture_parameters;
-	texture_parameters.width = 512;
-	texture_parameters.height = 512;
-	texture_parameters.depth_or_array_layers = 1;
-	texture_parameters.mip_level_count = 1;
-	texture_parameters.sample_count = 1;
-	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST;
-	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
+	{
+		kope_g5_texture_parameters texture_params = {0};
+		texture_params.format = KOPE_G5_TEXTURE_FORMAT_DEPTH32FLOAT;
+		texture_params.width = width;
+		texture_params.height = height;
+		texture_params.depth_or_array_layers = 1;
+		texture_params.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_params.mip_level_count = 1;
+		texture_params.sample_count = 1;
+		texture_params.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
+		kope_g5_device_create_texture(&device, &texture_params, &depth);
+	}
+
+	{
+		kope_g5_texture_parameters texture_parameters;
+		texture_parameters.width = 512;
+		texture_parameters.height = 512;
+		texture_parameters.depth_or_array_layers = 1;
+		texture_parameters.mip_level_count = 1;
+		texture_parameters.sample_count = 1;
+		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST;
+		kope_g5_device_create_texture(&device, &texture_parameters, &texture);
+	}
 
 	kope_g5_sampler_parameters sampler_parameters;
 	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
