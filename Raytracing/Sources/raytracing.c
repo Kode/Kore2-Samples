@@ -8,6 +8,10 @@
 #include <math.h>
 #include <string.h>
 
+#ifdef SCREENSHOT
+#include "../../screenshot.h"
+#endif
+
 static kope_g5_device device;
 static kope_g5_command_list list;
 static kope_g5_texture texture;
