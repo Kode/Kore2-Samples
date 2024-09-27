@@ -24,8 +24,8 @@ static kope_g5_sampler sampler;
 static kope_g5_buffer constants;
 static everything_set everything;
 
-static const int width = 1024;
-static const int height = 768;
+static const int width = 800;
+static const int height = 600;
 
 static bool first_update = true;
 
