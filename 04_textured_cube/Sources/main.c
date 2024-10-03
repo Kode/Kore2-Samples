@@ -264,12 +264,12 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 	kope_g5_buffer_parameters buffer_parameters;
-	buffer_parameters.size = 512 * 512 * 4;
+	buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 512 * 4) * 512;
 	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
 	kinc_image_t image;
-	kinc_image_init_from_file(&image, kope_g5_buffer_lock(&image_buffer), "uvtemplate.png");
+	kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock(&image_buffer), "uvtemplate.png", kope_g5_device_align_texture_row_bytes(&device, 512 * 4));
 	kinc_image_destroy(&image);
 	kope_g5_buffer_unlock(&image_buffer);
 

@@ -27,6 +27,7 @@ static const int width = 800;
 static const int height = 600;
 
 static bool first_update = true;
+static uint32_t buffer_index;
 
 static float time(void) {
 #ifdef SCREENSHOT
@@ -39,9 +40,11 @@ static float time(void) {
 static void update(void *data) {
 	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(time());
 
-	constants_type *constants_data = constants_type_buffer_lock(&constants);
+	constants_type *constants_data = constants_type_buffer_lock(&constants, buffer_index, 1);
 	constants_data->mvp = matrix;
 	constants_type_buffer_unlock(&constants);
+
+	buffer_index = (buffer_index + 1) % KOPE_G5_MAX_FRAMEBUFFERS;
 
 	if (first_update) {
 		kope_g5_image_copy_buffer source = {0};
@@ -107,24 +110,11 @@ int kickstart(int argc, char **argv) {
 	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
-	// kinc_image can not load images with row-alignment directly because stb_image doesn't support that :-(
-	uint32_t *image_data = (uint32_t *)malloc(250 * 4 * 250);
-	assert(image_data != NULL);
-
 	kinc_image_t image;
-	kinc_image_init_from_file(&image, image_data, "parrot.png");
+	kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock_all(&image_buffer), "parrot.png",
+	                                      kope_g5_device_align_texture_row_bytes(&device, 250 * 4));
 	kinc_image_destroy(&image);
-
-	uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
-	uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock(&image_buffer);
-	for (int y = 0; y < 250; ++y) {
-		for (int x = 0; x < 250; ++x) {
-			gpu_image_data[y * stride + x] = image_data[y * 250 + x];
-		}
-	}
 	kope_g5_buffer_unlock(&image_buffer);
-
-	free(image_data);
 
 	kope_g5_texture_parameters texture_parameters;
 	texture_parameters.width = 250;
@@ -181,14 +171,14 @@ int kickstart(int argc, char **argv) {
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
+		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 
-	constants_type_buffer_create(&device, &constants);
+	constants_type_buffer_create(&device, &constants, KOPE_G5_MAX_FRAMEBUFFERS);
 
 	{
 		everything_parameters parameters = {0};

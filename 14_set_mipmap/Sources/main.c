@@ -109,21 +109,9 @@ int kickstart(int argc, char **argv) {
 		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer0);
 
-		// kinc_image can not load images with row-alignment directly because stb_image doesn't support that :-(
-		uint32_t *image_data = (uint32_t *)malloc(512 * 4 * 512);
-		assert(image_data != NULL);
-
 		kinc_image_t image;
-		kinc_image_init_from_file(&image, image_data, "uvtemplate.png");
+		kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock(&image_buffer0), "uvtemplate.png", kope_g5_device_align_texture_row_bytes(&device, 512 * 4));
 		kinc_image_destroy(&image);
-
-		uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 512 * 4) / 4;
-		uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock(&image_buffer0);
-		for (int y = 0; y < 512; ++y) {
-			for (int x = 0; x < 512; ++x) {
-				gpu_image_data[y * stride + x] = image_data[y * 512 + x];
-			}
-		}
 		kope_g5_buffer_unlock(&image_buffer0);
 	}
 
@@ -133,21 +121,9 @@ int kickstart(int argc, char **argv) {
 		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer1);
 
-		// kinc_image can not load images with row-alignment directly because stb_image doesn't support that :-(
-		uint32_t *image_data = (uint32_t *)malloc(256 * 4 * 256);
-		assert(image_data != NULL);
-
 		kinc_image_t image;
-		kinc_image_init_from_file(&image, image_data, "uvtemplate2.png");
+		kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock(&image_buffer1), "uvtemplate2.png", kope_g5_device_align_texture_row_bytes(&device, 256 * 4));
 		kinc_image_destroy(&image);
-
-		uint32_t stride = kope_g5_device_align_texture_row_bytes(&device, 256 * 4) / 4;
-		uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock(&image_buffer1);
-		for (int y = 0; y < 256; ++y) {
-			for (int x = 0; x < 256; ++x) {
-				gpu_image_data[y * stride + x] = image_data[y * 256 + x];
-			}
-		}
 		kope_g5_buffer_unlock(&image_buffer1);
 	}
 
