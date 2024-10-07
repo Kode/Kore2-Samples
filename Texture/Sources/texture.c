@@ -27,7 +27,7 @@ static const int width = 800;
 static const int height = 600;
 
 static bool first_update = true;
-static uint32_t buffer_index;
+static uint64_t update_index = 0;
 
 static float time(void) {
 #ifdef SCREENSHOT
@@ -40,11 +40,9 @@ static float time(void) {
 static void update(void *data) {
 	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(time());
 
-	constants_type *constants_data = constants_type_buffer_lock(&constants, buffer_index, 1);
+	constants_type *constants_data = constants_type_buffer_lock(&constants, update_index % KOPE_G5_MAX_FRAMEBUFFERS, 1);
 	constants_data->mvp = matrix;
 	constants_type_buffer_unlock(&constants);
-
-	buffer_index = (buffer_index + 1) % KOPE_G5_MAX_FRAMEBUFFERS;
 
 	if (first_update) {
 		kope_g5_image_copy_buffer source = {0};
@@ -75,7 +73,7 @@ static void update(void *data) {
 
 	kong_set_render_pipeline(&list, &pipeline);
 
-	kong_set_descriptor_set_everything(&list, &everything);
+	kong_set_descriptor_set_everything(&list, &everything, update_index % KOPE_G5_MAX_FRAMEBUFFERS);
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
@@ -88,6 +86,8 @@ static void update(void *data) {
 	kope_g5_command_list_present(&list);
 
 	kope_g5_device_execute_command_list(&device, &list);
+
+	update_index += 1;
 
 #ifdef SCREENSHOT
 	screenshot_take(&device, &list, framebuffer, width, height);
@@ -105,7 +105,7 @@ int kickstart(int argc, char **argv) {
 
 	kope_g5_device_create_command_list(&device, &list);
 
-	kope_g5_buffer_parameters buffer_parameters;
+	kope_g5_buffer_parameters buffer_parameters = {0};
 	buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) * 250;
 	buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
@@ -116,7 +116,7 @@ int kickstart(int argc, char **argv) {
 	kinc_image_destroy(&image);
 	kope_g5_buffer_unlock(&image_buffer);
 
-	kope_g5_texture_parameters texture_parameters;
+	kope_g5_texture_parameters texture_parameters = {0};
 	texture_parameters.width = 250;
 	texture_parameters.height = 250;
 	texture_parameters.depth_or_array_layers = 1;
@@ -127,7 +127,7 @@ int kickstart(int argc, char **argv) {
 	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST;
 	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
 
-	kope_g5_sampler_parameters sampler_parameters;
+	kope_g5_sampler_parameters sampler_parameters = {0};
 	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
 	sampler_parameters.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
 	sampler_parameters.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;

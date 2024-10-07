@@ -8,7 +8,7 @@ struct vertex_out {
 	tex: float2;
 }
 
-#[set(everything)]
+#[set(everything), indexed]
 const constants: {
 	mvp: float3x3;
 };
