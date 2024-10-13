@@ -24,13 +24,14 @@ fun pos(input: vertex_in): vertex_out {
 }
 
 #[set(everything)]
-const tex: tex2d;
+const textures: tex2d[];
 
 #[set(everything)]
 const sam: sampler;
 
 fun pix(input: vertex_out): float4 {
-	var color: float4 = sample(tex, sam, input.tex);
+	uint index = uint(input.tex.x * 9);
+	var color: float4 = sample(textures[index], sam, float2(input.tex.x * 9 - index, input.tex.y));
 	return float4(color.r, color.g, color.b, 1.0);
 }
 
