@@ -49,7 +49,7 @@ static void update(void *data) {
 		for (int i = 0; i < 9; ++i) {
 			kope_g5_image_copy_buffer source = {0};
 			source.buffer = &image_buffer;
-			source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, 250 * 4);
+			source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, 639 * 4);
 
 			kope_g5_image_copy_texture destination = {0};
 			destination.texture = &textures[i];
