@@ -47,9 +47,13 @@ static void update(void *data) {
 
 	if (first_update) {
 		for (int i = 0; i < 9; ++i) {
+			int x = i % 3;
+			int y = i / 3;
+
 			kope_g5_image_copy_buffer source = {0};
 			source.buffer = &image_buffer;
 			source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, 639 * 4);
+			source.offset = y * 642 / 3 * source.bytes_per_row + x * 639 / 3 * 4;
 
 			kope_g5_image_copy_texture destination = {0};
 			destination.texture = &textures[i];
@@ -195,6 +199,7 @@ int kickstart(int argc, char **argv) {
 			parameters.textures[i].mip_level_count = 1;
 			parameters.textures[i].array_layer_count = 1;
 		}
+		parameters.textures_count = 9;
 		parameters.sam = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
