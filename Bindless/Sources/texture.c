@@ -75,7 +75,11 @@ static void update(void *data) {
 	clear_color.b = 0.0f;
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture = framebuffer;
+	parameters.color_attachments[0].texture.texture = framebuffer;
+	parameters.color_attachments[0].texture.array_layer_count = 1;
+	parameters.color_attachments[0].texture.mip_level_count = 1;
+	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
