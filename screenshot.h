@@ -27,7 +27,7 @@ static void screenshot_take(kope_g5_device *device, kope_g5_command_list *list, 
 
 	kope_g5_device_wait_until_idle(device);
 
-	uint8_t *pixels = (uint8_t *)kope_g5_buffer_lock(&screenshot_buffer);
+	uint8_t *pixels = (uint8_t *)kope_g5_buffer_lock_all(&screenshot_buffer);
 
 	stbi_write_png("test.png", width, height, 4, pixels, row_bytes);
 
