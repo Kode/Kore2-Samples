@@ -26,12 +26,12 @@ static const int width = 800;
 static const int height = 600;
 
 void update(void *data) {
-	constants_type *constants_data = constants_type_buffer_lock(&constants);
+	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
 	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(0);
 	constants_data->mvp = matrix;
 	constants_type_buffer_unlock(&constants);
 
-	compute_constants_type *compute_constants_data = compute_constants_type_buffer_lock(&compute_constants);
+	compute_constants_type *compute_constants_data = compute_constants_type_buffer_lock(&compute_constants, 0, 1);
 	compute_constants_data->roll = 0;
 	compute_constants_type_buffer_unlock(&compute_constants);
 
@@ -50,7 +50,11 @@ void update(void *data) {
 	clear_color.b = 0.25f;
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture = framebuffer;
+	parameters.color_attachments[0].texture.texture = framebuffer;
+	parameters.color_attachments[0].texture.array_layer_count = 1;
+	parameters.color_attachments[0].texture.mip_level_count = 1;
+	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -135,14 +139,14 @@ int kickstart(int argc, char **argv) {
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *id = (uint16_t *)kope_g5_buffer_lock(&indices);
+		uint16_t *id = (uint16_t *)kope_g5_buffer_lock_all(&indices);
 		id[0] = 0;
 		id[1] = 1;
 		id[2] = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 
-	constants_type_buffer_create(&device, &constants);
+	constants_type_buffer_create(&device, &constants, 1);
 
 	{
 		everything_parameters parameters = {0};
@@ -155,7 +159,7 @@ int kickstart(int argc, char **argv) {
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
 
-	compute_constants_type_buffer_create(&device, &compute_constants);
+	compute_constants_type_buffer_create(&device, &compute_constants, 1);
 
 	{
 		compute_parameters parameters = {0};
