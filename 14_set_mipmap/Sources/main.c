@@ -66,7 +66,11 @@ static void update(void *data) {
 		clear_color.b = 0.0f;
 		clear_color.a = 1.0f;
 		parameters.color_attachments[0].clear_value = clear_color;
-		parameters.color_attachments[0].texture = framebuffer;
+		parameters.color_attachments[0].texture.texture = framebuffer;
+		parameters.color_attachments[0].texture.array_layer_count = 1;
+		parameters.color_attachments[0].texture.mip_level_count = 1;
+		parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+		parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 		parameters.color_attachments_count = 1;
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
@@ -110,7 +114,8 @@ int kickstart(int argc, char **argv) {
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer0);
 
 		kinc_image_t image;
-		kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock(&image_buffer0), "uvtemplate.png", kope_g5_device_align_texture_row_bytes(&device, 512 * 4));
+		kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock_all(&image_buffer0), "uvtemplate.png",
+		                                      kope_g5_device_align_texture_row_bytes(&device, 512 * 4));
 		kinc_image_destroy(&image);
 		kope_g5_buffer_unlock(&image_buffer0);
 	}
@@ -122,7 +127,8 @@ int kickstart(int argc, char **argv) {
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer1);
 
 		kinc_image_t image;
-		kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock(&image_buffer1), "uvtemplate2.png", kope_g5_device_align_texture_row_bytes(&device, 256 * 4));
+		kinc_image_init_from_file_with_stride(&image, kope_g5_buffer_lock_all(&image_buffer1), "uvtemplate2.png",
+		                                      kope_g5_device_align_texture_row_bytes(&device, 256 * 4));
 		kinc_image_destroy(&image);
 		kope_g5_buffer_unlock(&image_buffer1);
 	}
@@ -166,7 +172,7 @@ int kickstart(int argc, char **argv) {
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
+		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
