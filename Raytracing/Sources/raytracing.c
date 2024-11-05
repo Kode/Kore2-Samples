@@ -136,7 +136,7 @@ int kickstart(int argc, char **argv) {
 		params.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &params, &quadVB);
 
-		void *data = kope_g5_buffer_lock(&quadVB);
+		void *data = kope_g5_buffer_lock_all(&quadVB);
 		memcpy(data, quadVtx, sizeof(quadVtx));
 		kope_g5_buffer_unlock(&quadVB);
 	}
@@ -149,7 +149,7 @@ int kickstart(int argc, char **argv) {
 		params.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &params, &cubeVB);
 
-		void *data = kope_g5_buffer_lock(&cubeVB);
+		void *data = kope_g5_buffer_lock_all(&cubeVB);
 		memcpy(data, cubeVtx, sizeof(cubeVtx));
 		kope_g5_buffer_unlock(&cubeVB);
 	}
@@ -160,7 +160,7 @@ int kickstart(int argc, char **argv) {
 		params.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &params, &cubeIB);
 
-		void *data = kope_g5_buffer_lock(&cubeIB);
+		void *data = kope_g5_buffer_lock_all(&cubeIB);
 		memcpy(data, cubeIdx, sizeof(cubeIdx));
 		kope_g5_buffer_unlock(&cubeIB);
 	}
@@ -176,8 +176,11 @@ int kickstart(int argc, char **argv) {
 	{
 		rayset_parameters parameters = {0};
 		parameters.scene = &hierarchy;
-		parameters.render_target = &texture;
-		parameters.render_target_mip_level = 0;
+		parameters.render_target.texture = &texture;
+		parameters.render_target.base_mip_level = 0;
+		parameters.render_target.mip_level_count = 1;
+		parameters.render_target.base_array_layer = 0;
+		parameters.render_target.array_layer_count = 1;
 		kong_create_rayset_set(&device, &parameters, &rayset);
 	}
 
