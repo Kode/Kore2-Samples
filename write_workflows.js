@@ -8,6 +8,7 @@ const samples = [
 	'ComputeShader',
 	'TextureArray',
   //'RuntimeShaderCompilation',
+  'Bindless',
   '00_empty',
   '01_triangle',
   '02_matrix',
