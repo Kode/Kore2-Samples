@@ -27,7 +27,6 @@ static void update(void *data) {
 		kope_g5_render_pass_parameters parameters = {0};
 		parameters.color_attachments_count = 6;
 		for (int i = 0; i < 6; ++i) {
-			parameters.color_attachments[i].depth_slice = i;
 			parameters.color_attachments[i].load_op = KOPE_G5_LOAD_OP_CLEAR;
 			kope_g5_color color;
 			color.r = 0.0f;
@@ -37,6 +36,7 @@ static void update(void *data) {
 			parameters.color_attachments[i].clear_value = color;
 			parameters.color_attachments[i].texture.texture = &render_target;
 			parameters.color_attachments[i].texture.array_layer_count = 1;
+			parameters.color_attachments[i].texture.base_array_layer = i;
 			parameters.color_attachments[i].texture.mip_level_count = 1;
 			parameters.color_attachments[i].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
 			parameters.color_attachments[i].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
