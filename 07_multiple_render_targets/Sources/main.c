@@ -36,7 +36,11 @@ static void update(void *data) {
 		clear_color.b = 0.0f;
 		clear_color.a = 1.0f;
 		parameters.color_attachments[i].clear_value = clear_color;
-		parameters.color_attachments[i].texture = &render_targets[i];
+		parameters.color_attachments[i].texture.texture = &render_targets[i];
+		parameters.color_attachments[i].texture.array_layer_count = 1;
+		parameters.color_attachments[i].texture.mip_level_count = 1;
+		parameters.color_attachments[i].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+		parameters.color_attachments[i].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	}
 	parameters.color_attachments_count = 4;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
@@ -146,7 +150,7 @@ int kickstart(int argc, char **argv) {
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
+		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
