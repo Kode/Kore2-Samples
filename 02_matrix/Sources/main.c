@@ -109,7 +109,7 @@ static void update(void *data) {
 	mvp = kinc_matrix4x4_multiply(&mvp, &view);
 	mvp = kinc_matrix4x4_multiply(&mvp, &model);
 
-	constants_type *constants_data = constants_type_buffer_lock(&constants);
+	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
 	constants_data->mvp = mvp;
 	constants_type_buffer_unlock(&constants);
 
@@ -124,7 +124,11 @@ static void update(void *data) {
 	clear_color.b = 0.25f;
 	clear_color.a = 1.0f;
 	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture = framebuffer;
+	parameters.color_attachments[0].texture.texture = framebuffer;
+	parameters.color_attachments[0].texture.array_layer_count = 1;
+	parameters.color_attachments[0].texture.mip_level_count = 1;
+	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -182,7 +186,7 @@ int kickstart(int argc, char **argv) {
 		params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &params, &indices);
 		{
-			uint16_t *i = (uint16_t *)kope_g5_buffer_lock(&indices);
+			uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
 			i[0] = 0;
 			i[1] = 1;
 			i[2] = 2;
@@ -190,7 +194,7 @@ int kickstart(int argc, char **argv) {
 		}
 	}
 
-	constants_type_buffer_create(&device, &constants);
+	constants_type_buffer_create(&device, &constants, 1);
 
 	{
 		everything_parameters parameters;
