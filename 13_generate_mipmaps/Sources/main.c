@@ -17,6 +17,7 @@ static fs_vertex_in_buffer vertices_fs;
 static kope_g5_buffer indices;
 static kope_g5_texture render_target;
 static kope_g5_sampler sampler;
+static kope_g5_sampler mip_sampler;
 static fs_set set;
 static mip_set mip_sets[4];
 
@@ -195,6 +196,19 @@ int kickstart(int argc, char **argv) {
 	fsparams.fs_sampler = &sampler;
 	kong_create_fs_set(&device, &fsparams, &set);
 
+	kope_g5_sampler_parameters mip_sampler_params = {0};
+	mip_sampler_params.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
+	mip_sampler_params.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
+	mip_sampler_params.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;
+	mip_sampler_params.mag_filter = KOPE_G5_FILTER_MODE_LINEAR;
+	mip_sampler_params.min_filter = KOPE_G5_FILTER_MODE_LINEAR;
+	mip_sampler_params.mipmap_filter = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
+	mip_sampler_params.lod_min_clamp = 0;
+	mip_sampler_params.lod_max_clamp = 32;
+	mip_sampler_params.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
+	mip_sampler_params.max_anisotropy = 1;
+	kope_g5_device_create_sampler(&device, &mip_sampler_params, &mip_sampler);
+
 	for (int i = 0; i < 4; ++i) {
 		mip_parameters cparams = {0};
 		cparams.mip_source_texture.texture = &render_target;
@@ -202,11 +216,15 @@ int kickstart(int argc, char **argv) {
 		cparams.mip_source_texture.mip_level_count = 1;
 		cparams.mip_source_texture.base_array_layer = 0;
 		cparams.mip_source_texture.array_layer_count = 1;
+
+		cparams.mip_source_sampler = &mip_sampler;
+
 		cparams.mip_destination_texture.texture = &render_target;
 		cparams.mip_destination_texture.base_mip_level = i + 1;
 		cparams.mip_destination_texture.mip_level_count = 1;
 		cparams.mip_destination_texture.base_array_layer = 0;
 		cparams.mip_destination_texture.array_layer_count = 1;
+
 		kong_create_mip_set(&device, &cparams, &mip_sets[i]);
 	}
 
