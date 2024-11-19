@@ -8,6 +8,7 @@ const samples = [
 	'ComputeShader',
 	'TextureArray',
   //'RuntimeShaderCompilation',
+  'Raytracing',
   'Bindless',
   '00_empty',
   '01_triangle',
@@ -52,6 +53,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 ${steps}
+    - name: Install WARP 1.0.13
+      run: dotnet add package Microsoft.Direct3D.WARP --version 1.0.13
     - name: Get Submodules
       run: ./get_dlc
     - name: Get the FreeBSD-submodule

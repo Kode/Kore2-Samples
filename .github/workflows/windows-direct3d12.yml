@@ -68,6 +68,18 @@ jobs:
       with:
         name: TextureArray image
         path: TextureArray/Deployment/test.png
+    - name: Compile Raytracing
+      working-directory: Raytracing
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check Raytracing
+      working-directory: Raytracing
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  Raytracing failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Raytracing image
+        path: Raytracing/Deployment/test.png
     - name: Compile Bindless
       working-directory: Bindless
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
