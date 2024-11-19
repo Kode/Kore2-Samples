@@ -30,8 +30,8 @@ static kope_g5_raytracing_volume quadBlas;
 
 static kope_g5_raytracing_hierarchy hierarchy;
 
-static const uint32_t width = 1920;
-static const uint32_t height = 1080;
+static const uint32_t width = 800;
+static const uint32_t height = 600;
 
 static kinc_matrix4x4_t transforms[3];
 
