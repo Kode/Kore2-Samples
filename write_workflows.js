@@ -281,7 +281,10 @@ ${postfixSteps}
     const vs = workflow.vs ? ' -v ' + workflow.vs : '';
 
     workflowText +=
-`    - name: Compile ${sample}
+`    - name: Copy WARP
+      working-directory: ${sample}
+      run: echo F|xcopy D:\\a\\KopeKong-Samples\\KopeKong-Samples\\Microsoft.Direct3D.WARP.1.0.13\\build\\native\\bin\\x64\\d3d10warp.dll build\\x64\\Debug\\d3d10warp.dll
+    - name: Compile ${sample}
       working-directory: ${sample}
       run: ${prefix}../Kinc/make ${sys}${vs}${gfx}${options} --option screenshot --debug --run${postfix}
     - name: Check ${sample}
