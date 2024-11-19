@@ -70,6 +70,7 @@ static void update_transforms(void) {
 }
 
 static bool first = true;
+static uint64_t frame = 0;
 
 void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
@@ -104,8 +105,12 @@ void update(void *data) {
 	kope_g5_device_execute_command_list(&device, &list);
 
 #ifdef SCREENSHOT
-	screenshot_take(&device, &list, framebuffer, width, height);
+	if (frame == 3) {
+		screenshot_take(&device, &list, framebuffer, width, height);
+	}
 #endif
+
+	++frame;
 }
 
 int kickstart(int argc, char **argv) {
