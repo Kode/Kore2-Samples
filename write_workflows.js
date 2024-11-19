@@ -252,7 +252,7 @@ jobs:
 ${java}
 ${steps}
     - name: Install WARP 1.0.13
-      run: dotnet add package Microsoft.Direct3D.WARP --version 1.0.13
+      run: nuget install Microsoft.Direct3D.WARP
     - name: Get Submodules
       run: ./get_dlc
 ${postfixSteps}
