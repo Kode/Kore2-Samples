@@ -35,14 +35,22 @@ static const uint32_t height = 600;
 
 static kinc_matrix4x4_t transforms[3];
 
+static float time(void) {
+#ifdef SCREENSHOT
+	return 0.3f;
+#else
+	return (float)kinc_time();
+#endif
+}
+
 static void update_transforms(void) {
-	float time = (float)kinc_time();
+	float t = time();
 
 	{
-		kinc_matrix4x4_t cube = kinc_matrix4x4_rotation_y(time / 3);
-		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_x(time / 2);
+		kinc_matrix4x4_t cube = kinc_matrix4x4_rotation_y(t / 3);
+		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_x(t / 2);
 		cube = kinc_matrix4x4_multiply(&a, &cube);
-		kinc_matrix4x4_t b = kinc_matrix4x4_rotation_z(time / 5);
+		kinc_matrix4x4_t b = kinc_matrix4x4_rotation_z(t / 5);
 		cube = kinc_matrix4x4_multiply(&b, &cube);
 		kinc_matrix4x4_t c = kinc_matrix4x4_translation(-1.5, 2, 2);
 		cube = kinc_matrix4x4_multiply(&c, &cube);
@@ -52,7 +60,7 @@ static void update_transforms(void) {
 
 	{
 		kinc_matrix4x4_t mirror = kinc_matrix4x4_rotation_x(-1.8f);
-		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_y(sinf(time) / 8 + 1);
+		kinc_matrix4x4_t a = kinc_matrix4x4_rotation_y(sinf(t) / 8 + 1);
 		mirror = kinc_matrix4x4_multiply(&a, &mirror);
 		kinc_matrix4x4_t b = kinc_matrix4x4_translation(2, 2, 2);
 		mirror = kinc_matrix4x4_multiply(&b, &mirror);
