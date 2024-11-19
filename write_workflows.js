@@ -51,10 +51,8 @@ jobs:
     runs-on: ${workflow.runsOn}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 ${steps}
-    - name: Install WARP 1.0.13
-      run: dotnet add package Microsoft.Direct3D.WARP --version 1.0.13
     - name: Get Submodules
       run: ./get_dlc
     - name: Get the FreeBSD-submodule
@@ -137,7 +135,7 @@ jobs:
             distro: ubuntu20.04
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: uraimo/run-on-arch-action@v2.0.9
         name: Run Tests in \${{ matrix.distro }} \${{ matrix.arch }}
         id: build
@@ -253,6 +251,8 @@ jobs:
     - uses: actions/checkout@v4
 ${java}
 ${steps}
+    - name: Install WARP 1.0.13
+      run: dotnet add package Microsoft.Direct3D.WARP --version 1.0.13
     - name: Get Submodules
       run: ./get_dlc
 ${postfixSteps}
