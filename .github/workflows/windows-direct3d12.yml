@@ -24,7 +24,7 @@ jobs:
 
     - name: Copy WARP
       working-directory: Shader
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile Shader
       working-directory: Shader
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -39,7 +39,7 @@ jobs:
         path: Shader/Deployment/test.png
     - name: Copy WARP
       working-directory: Texture
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile Texture
       working-directory: Texture
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -54,7 +54,7 @@ jobs:
         path: Texture/Deployment/test.png
     - name: Copy WARP
       working-directory: ComputeShader
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile ComputeShader
       working-directory: ComputeShader
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -69,7 +69,7 @@ jobs:
         path: ComputeShader/Deployment/test.png
     - name: Copy WARP
       working-directory: TextureArray
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile TextureArray
       working-directory: TextureArray
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -84,7 +84,7 @@ jobs:
         path: TextureArray/Deployment/test.png
     - name: Copy WARP
       working-directory: Raytracing
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile Raytracing
       working-directory: Raytracing
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -99,7 +99,7 @@ jobs:
         path: Raytracing/Deployment/test.png
     - name: Copy WARP
       working-directory: Bindless
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile Bindless
       working-directory: Bindless
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -114,7 +114,7 @@ jobs:
         path: Bindless/Deployment/test.png
     - name: Copy WARP
       working-directory: 00_empty
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 00_empty
       working-directory: 00_empty
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -129,7 +129,7 @@ jobs:
         path: 00_empty/Deployment/test.png
     - name: Copy WARP
       working-directory: 01_triangle
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 01_triangle
       working-directory: 01_triangle
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -144,7 +144,7 @@ jobs:
         path: 01_triangle/Deployment/test.png
     - name: Copy WARP
       working-directory: 02_matrix
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 02_matrix
       working-directory: 02_matrix
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -159,7 +159,7 @@ jobs:
         path: 02_matrix/Deployment/test.png
     - name: Copy WARP
       working-directory: 03_colored_cube
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 03_colored_cube
       working-directory: 03_colored_cube
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -174,7 +174,7 @@ jobs:
         path: 03_colored_cube/Deployment/test.png
     - name: Copy WARP
       working-directory: 04_textured_cube
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 04_textured_cube
       working-directory: 04_textured_cube
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -189,7 +189,7 @@ jobs:
         path: 04_textured_cube/Deployment/test.png
     - name: Copy WARP
       working-directory: 05_camera_controls
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 05_camera_controls
       working-directory: 05_camera_controls
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -204,7 +204,7 @@ jobs:
         path: 05_camera_controls/Deployment/test.png
     - name: Copy WARP
       working-directory: 06_render_targets
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 06_render_targets
       working-directory: 06_render_targets
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -219,7 +219,7 @@ jobs:
         path: 06_render_targets/Deployment/test.png
     - name: Copy WARP
       working-directory: 07_multiple_render_targets
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 07_multiple_render_targets
       working-directory: 07_multiple_render_targets
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -234,7 +234,7 @@ jobs:
         path: 07_multiple_render_targets/Deployment/test.png
     - name: Copy WARP
       working-directory: 08_float_render_targets
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 08_float_render_targets
       working-directory: 08_float_render_targets
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -249,7 +249,7 @@ jobs:
         path: 08_float_render_targets/Deployment/test.png
     - name: Copy WARP
       working-directory: 09_depth_render_targets
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 09_depth_render_targets
       working-directory: 09_depth_render_targets
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -264,7 +264,7 @@ jobs:
         path: 09_depth_render_targets/Deployment/test.png
     - name: Copy WARP
       working-directory: 10_cubemap
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 10_cubemap
       working-directory: 10_cubemap
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -279,7 +279,7 @@ jobs:
         path: 10_cubemap/Deployment/test.png
     - name: Copy WARP
       working-directory: 11_instanced_rendering
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 11_instanced_rendering
       working-directory: 11_instanced_rendering
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -294,7 +294,7 @@ jobs:
         path: 11_instanced_rendering/Deployment/test.png
     - name: Copy WARP
       working-directory: 12_set_render_target_depth
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 12_set_render_target_depth
       working-directory: 12_set_render_target_depth
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -309,7 +309,7 @@ jobs:
         path: 12_set_render_target_depth/Deployment/test.png
     - name: Copy WARP
       working-directory: 13_generate_mipmaps
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 13_generate_mipmaps
       working-directory: 13_generate_mipmaps
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -324,7 +324,7 @@ jobs:
         path: 13_generate_mipmaps/Deployment/test.png
     - name: Copy WARP
       working-directory: 14_set_mipmap
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 14_set_mipmap
       working-directory: 14_set_mipmap
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
@@ -339,7 +339,7 @@ jobs:
         path: 14_set_mipmap/Deployment/test.png
     - name: Copy WARP
       working-directory: 15_deinterleaved_buffers
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll build\x64\Debug\d3d10warp.dll
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
     - name: Compile 15_deinterleaved_buffers
       working-directory: 15_deinterleaved_buffers
       run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
