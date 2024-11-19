@@ -12,7 +12,7 @@ project.addDefine('KOPE_NVAPI');*/
 
 if (Options.screenshot) {
 	project.addDefine('SCREENSHOT');
-	//project.addDefine('KOPE_D3D12_FORCE_WARP');
+	project.addDefine('KOPE_D3D12_FORCE_WARP');
 }
 
 project.flatten();
