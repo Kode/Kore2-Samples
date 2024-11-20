@@ -50,9 +50,6 @@ static void update(void *data) {
 
 	if (first_update) {
 		for (int i = 0; i < 9; ++i) {
-			int x = i % 3;
-			int y = i / 3;
-
 			kope_g5_image_copy_buffer source = {0};
 			source.buffer = &image_buffers[i];
 			source.bytes_per_row = kope_g5_device_align_texture_row_bytes(&device, image_width * 4);
