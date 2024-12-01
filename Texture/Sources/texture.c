@@ -107,7 +107,7 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kope_g5_buffer_parameters buffer_parameters = {0};
 	buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) * 250;

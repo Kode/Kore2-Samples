@@ -75,7 +75,7 @@ static void update(void *data) {
 
 	kope_g5_command_list_present(&list);
 
-	kope_g5_device_execute_command_list(&device, &list);
+	kope_g5_device_execute_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 #ifdef SCREENSHOT
 	screenshot_take(&device, &list, framebuffer, width, height);

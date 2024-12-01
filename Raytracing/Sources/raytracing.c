@@ -141,7 +141,7 @@ int kickstart(int argc, char **argv) {
 	render_target_parameters.usage = KONG_G5_TEXTURE_USAGE_READ_WRITE;
 	kope_g5_device_create_texture(&device, &render_target_parameters, &texture);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	{
 		kope_g5_buffer_parameters params;

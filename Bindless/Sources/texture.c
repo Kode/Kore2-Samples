@@ -114,7 +114,7 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	for (int i = 0; i < 9; ++i) {
 		kope_g5_buffer_parameters buffer_parameters = {0};

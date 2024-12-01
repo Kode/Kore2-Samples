@@ -111,7 +111,7 @@ int kickstart(int argc, char **argv) {
 	sampler_parameters.max_anisotropy = 1;
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{

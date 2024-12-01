@@ -87,7 +87,7 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	{
 		kope_g5_texture_parameters texture_parameters;

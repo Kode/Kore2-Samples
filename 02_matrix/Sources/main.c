@@ -161,7 +161,7 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
