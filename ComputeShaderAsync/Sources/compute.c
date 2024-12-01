@@ -12,6 +12,7 @@
 
 static kope_g5_device device;
 static kope_g5_command_list list;
+static kope_g5_command_list async_list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_buffer constants;
@@ -21,11 +22,15 @@ static kope_g5_sampler sampler;
 static everything_set everything;
 static compute_set compute;
 static kope_g5_buffer image_buffer;
+static kope_g5_fence fence;
 
 static const int width = 800;
 static const int height = 600;
+static uint64_t frame = 0;
 
 void update(void *data) {
+	++frame;
+
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
 	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(0);
 	constants_data->mvp = matrix;
@@ -37,9 +42,9 @@ void update(void *data) {
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
-	kong_set_compute_pipeline(&list, &comp);
-	kong_set_descriptor_set_compute(&list, &compute);
-	kope_g5_command_list_compute(&list, 256 / 16, 256 / 16, 1);
+	kong_set_compute_pipeline(&async_list, &comp);
+	kong_set_descriptor_set_compute(&async_list, &compute);
+	kope_g5_command_list_compute(&async_list, 256 / 16, 256 / 16, 1);
 
 	kope_g5_render_pass_parameters parameters = {0};
 	parameters.color_attachments_count = 1;
@@ -71,6 +76,10 @@ void update(void *data) {
 
 	kope_g5_command_list_present(&list);
 
+	kope_g5_device_execute_command_list(&device, &async_list);
+	kope_g5_device_signal(&device, KOPE_G5_COMMAND_LIST_TYPE_COMPUTE, &fence, frame);
+
+	kope_g5_device_wait(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &fence, frame);
 	kope_g5_device_execute_command_list(&device, &list);
 
 #ifdef SCREENSHOT
@@ -111,7 +120,10 @@ int kickstart(int argc, char **argv) {
 	sampler_parameters.max_anisotropy = 1;
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
-	kope_g5_device_create_command_list(&device, &list);
+	kope_g5_device_create_fence(&device, &fence);
+
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
+	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_COMPUTE, &async_list);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
