@@ -395,13 +395,12 @@ const workflows = [
       run: sudo apt install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev vulkan-sdk libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `
   },
-  {
+  */{
     sys: 'macOS',
     gfx: 'Metal',
-    runsOn: 'macOS-latest',
-    RuntimeShaderCompilation: true
+    runsOn: 'macOS-latest'
   },
-  {
+  /*{
     sys: 'macOS',
     gfx: 'OpenGL',
     runsOn: 'macOS-latest'
