@@ -251,9 +251,17 @@ jobs:
     - uses: actions/checkout@v4
 ${java}
 ${steps}
-    - name: Install WARP 1.0.13
+`;
+
+if (workflow.sys === 'Windows') {
+    workflowText +=
+`    - name: Install WARP 1.0.13
       run: nuget install Microsoft.Direct3D.WARP
-    - name: Get Submodules
+`;
+}
+
+workflowText +=
+`    - name: Get Submodules
       run: ./get_dlc
 ${postfixSteps}
 `;
@@ -280,11 +288,16 @@ ${postfixSteps}
     const sys = workflow.sys === 'macOS' ? 'osx' : (workflow.sys === 'UWP' ? 'windowsapp' : workflow.sys.toLowerCase());
     const vs = workflow.vs ? ' -v ' + workflow.vs : '';
 
-    workflowText +=
+    if (workflow.sys === 'Windows') {
+      workflowText +=
 `    - name: Copy WARP
       working-directory: ${sample}
       run: echo F|xcopy D:\\a\\KopeKong-Samples\\KopeKong-Samples\\Microsoft.Direct3D.WARP.1.0.13\\build\\native\\bin\\x64\\d3d10warp.dll Deployment\\d3d10warp.dll
-    - name: Compile ${sample}
+`;
+    }
+
+    workflowText +=
+`    - name: Compile ${sample}
       working-directory: ${sample}
       run: ${prefix}../Kinc/make ${sys}${vs}${gfx}${options} --option screenshot --debug --run${postfix}
     - name: Check ${sample}
