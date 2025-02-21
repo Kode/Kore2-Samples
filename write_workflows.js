@@ -55,7 +55,7 @@ ${steps}
     - name: Get Submodules
       run: ./get_dlc
     - name: Get the FreeBSD-submodule
-      run: git -C Kinc submodule update --init Tools/freebsd_x64
+      run: git -C Kore submodule update --init Tools/freebsd_x64
     - name: Compile in FreeBSD VM
       id: build
       uses: vmactions/freebsd-vm@v0
@@ -92,7 +92,7 @@ ${steps}
     workflowText +=
 `          echo " * Compile ${sample}"
           cd ${sample}
-          ../Kinc/make ${sys}${vs}${gfx}${options} --compile${postfix}
+          ../Kore/make ${sys}${vs}${gfx}${options} --compile${postfix}
           cd ..
 `;
     if (workflow.env) {
@@ -162,10 +162,10 @@ jobs:
           # Produce a binary artifact and place it in the mounted volume
           run: |
             echo " * Make Git happy"
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples/Kinc
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples/Kinc/Tools/linux_arm
-            git config --global --add safe.directory /home/runner/work/Kinc-Samples/Kinc-Samples/Kinc/Tools/linux_arm64
+            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples
+            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples/Kore
+            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples/Kore/Tools/linux_arm
+            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples/Kore/Tools/linux_arm64
             echo " * Get Submodules"
             ./get_dlc
 `;
@@ -195,7 +195,7 @@ jobs:
     workflowText +=
 `            echo " * Compile ${sample}"
             cd ${sample}
-            ../Kinc/make -g opengl --compile
+            ../Kore/make -g opengl --compile
             cd ..
 `;
     if (workflow.env) {
@@ -280,7 +280,7 @@ ${postfixSteps}
     workflowText +=
 `    - name: Compile ${sample}
       working-directory: ${sample}
-      run: ${prefix}../Kinc/make ${sys}${vs}${gfx}${options} --compile${postfix}
+      run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --compile${postfix}
 `;
     if (workflow.env) {
       workflowText += workflow.env;

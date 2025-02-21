@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-git -C `dirname "$0"` submodule update --init Kinc
+git -C `dirname "$0"` submodule update --init Kore
 git -C `dirname "$0"` submodule update --init --recursive RuntimeShaderCompilation/krafix
-bash `dirname "$0"`/Kinc/get_dlc
+bash `dirname "$0"`/Kore/get_dlc
