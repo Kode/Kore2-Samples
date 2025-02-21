@@ -10,14 +10,20 @@
 #include "../../screenshot.h"
 #endif
 
+#define USE_BUFFER_IMAGE
+
 static kope_g5_device device;
 static kope_g5_command_list list;
 static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_buffer constants;
 static kope_g5_buffer compute_constants;
+#ifdef USE_BUFFER_IMAGE
+static kope_g5_buffer buffer_texture;
+#else
 static kope_g5_texture texture;
 static kope_g5_sampler sampler;
+#endif
 static everything_set everything;
 static compute_set compute;
 static kope_g5_buffer image_buffer;
@@ -87,6 +93,13 @@ int kickstart(int argc, char **argv) {
 
 	kong_init(&device);
 
+#ifdef USE_BUFFER_IMAGE
+	const kope_g5_buffer_parameters buffer_texture_parameters = {
+	    .size = 256 * 256 * 4,
+	    .usage_flags = KOPE_G5_BUFFER_USAGE_READ_WRITE,
+	};
+	kope_g5_device_create_buffer(&device, &buffer_texture_parameters, &buffer_texture);
+#else
 	kope_g5_texture_parameters texture_parameters;
 	texture_parameters.width = 256;
 	texture_parameters.height = 256;
@@ -110,6 +123,7 @@ int kickstart(int argc, char **argv) {
 	sampler_parameters.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
 	sampler_parameters.max_anisotropy = 1;
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
+#endif
 
 	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
@@ -151,11 +165,15 @@ int kickstart(int argc, char **argv) {
 	{
 		everything_parameters parameters = {0};
 		parameters.constants = &constants;
+#ifdef USE_BUFFER_IMAGE
+		parameters.comp_texture = &buffer_texture;
+#else
 		parameters.comp_texture.texture = &texture;
 		parameters.comp_texture.base_mip_level = 0;
 		parameters.comp_texture.mip_level_count = 1;
 		parameters.comp_texture.array_layer_count = 1;
 		parameters.comp_sampler = &sampler;
+#endif
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
 
@@ -164,10 +182,14 @@ int kickstart(int argc, char **argv) {
 	{
 		compute_parameters parameters = {0};
 		parameters.compute_constants = &compute_constants;
+#ifdef USE_BUFFER_IMAGE
+		parameters.comp_texture = &buffer_texture;
+#else
 		parameters.dest_texture.texture = &texture;
 		parameters.dest_texture.base_mip_level = 0;
 		parameters.dest_texture.mip_level_count = 1;
 		parameters.dest_texture.array_layer_count = 1;
+#endif
 		kong_create_compute_set(&device, &parameters, &compute);
 	}
 
