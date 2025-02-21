@@ -29,81 +29,6 @@ const samples = [
 
 const workflowsDir = path.join('.github', 'workflows');
 
-function writeFreeBSDWorkflow(workflow) {
-  const steps = workflow.steps ?? '';
-  const postfixSteps = workflow.postfixSteps ?? '';
-
-  const workflowName = workflow.gfx ? (workflow.sys + ' (' + workflow.gfx + ')') : workflow.sys;
-  let workflowText = `name: ${workflowName}
-
-on:
-  push:
-    branches:
-    - main
-  pull_request:
-    branches:
-    - main
-
-jobs:
-  build:
-
-    runs-on: ${workflow.runsOn}
-
-    steps:
-    - uses: actions/checkout@v3
-${steps}
-    - name: Get Submodules
-      run: ./get_dlc
-    - name: Get the FreeBSD-submodule
-      run: git -C Kore submodule update --init Tools/freebsd_x64
-    - name: Compile in FreeBSD VM
-      id: build
-      uses: vmactions/freebsd-vm@v0
-      with:
-        usesh: true
-        copyback: false
-        mem: 2048
-        prepare: pkg install -y bash alsa-lib libXinerama mesa-libs libXi xorg-vfbserver libXrandr libXi libXcursor evdev-proto libinotify ImageMagick7-nox11 libxkbcommon
-        run: |
-`;
-
-  for (const sample of samples) {
-    if (sample === 'RuntimeShaderCompilation') {
-      if (!workflow.RuntimeShaderCompilation) {
-        continue;
-      }
-    }
-
-    if (workflow.noCompute && sample === 'ComputeShader') {
-      continue;
-    }
-
-    if (workflow.noTexArray && sample === 'TextureArray') {
-      continue;
-    }
-
-    const prefix = workflow.compilePrefix ?? '';
-    const postfix = workflow.compilePostfix ?? '';
-    const gfx = workflow.gfx ? ((workflow.gfx === 'WebGL') ? ' -g opengl' : ' -g ' + workflow.gfx.toLowerCase().replace(/ /g, '')) : '';
-    const options = workflow.options ? ' ' + workflow.options : '';
-    const sys = workflow.sys === 'macOS' ? 'osx' : (workflow.sys === 'UWP' ? 'windowsapp' : workflow.sys.toLowerCase());
-    const vs = workflow.vs ? ' -v ' + workflow.vs : '';
-
-    workflowText +=
-`          echo " * Compile ${sample}"
-          cd ${sample}
-          ../Kore/make ${sys}${vs}${gfx}${options} --compile${postfix}
-          cd ..
-`;
-    if (workflow.env) {
-      workflowText += workflow.env;
-    }
-  }
-
-  const name = workflow.gfx ? (workflow.sys.toLowerCase() + '-' + workflow.gfx.toLowerCase().replace(/ /g, '')) : workflow.sys.toLowerCase();
-  fs.writeFileSync(path.join(workflowsDir, name + '.yml'), workflowText, {encoding: 'utf8'});
-}
-
 function writeWorkflow(workflow) {
   if (workflow.sys === 'FreeBSD') {
     writeFreeBSDWorkflow(workflow);
@@ -228,11 +153,6 @@ const workflows = [
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
 `
   },
-  /*{
-    sys: 'FreeBSD',
-    gfx: 'OpenGL',
-    runsOn: 'macos-12'
-  },*/
   {
     sys: 'iOS',
     gfx: 'Metal',
