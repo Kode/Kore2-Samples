@@ -10,138 +10,83 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
-    name: Build on ${{ matrix.distro }} ${{ matrix.arch }}
 
-    # Run steps for both armv6 and aarch64
-    strategy:
-      matrix:
-        include:
-          - arch: aarch64
-            distro: ubuntu20.04
-          - arch: armv7
-            distro: ubuntu20.04
+    runs-on: ubuntu-22.04-arm
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: uraimo/run-on-arch-action@v2.0.9
-        name: Run Tests in ${{ matrix.distro }} ${{ matrix.arch }}
-        id: build
-        with:
-          arch: ${{ matrix.arch }}
-          distro: ${{ matrix.distro }}
+    - uses: actions/checkout@v3
 
-          # Not required, but speeds up builds
-          githubToken: ${{ github.token }}
+    - name: Apt Update
+      run: sudo apt update
+    - name: Apt Install
+      run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 
-          # The shell to run commands with in the container
-          shell: /bin/bash
+    - name: Get Submodules
+      run: ./get_dlc
 
-          # Install some dependencies in the container. This speeds up builds if
-          # you are also using githubToken. Any dependencies installed here will
-          # be part of the container image that gets cached, so subsequent
-          # builds don't have to re-install them. The image layer is cached
-          # publicly in your project's package repository, so it is vital that
-          # no secrets are present in the container state or logs.
-          install: |
-              apt-get update -y -q
-              apt-get upgrade -y -q
-              apt-get install -y -q libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev git build-essential imagemagick xvfb libwayland-dev wayland-protocols libxkbcommon-dev ninja-build
-
-          # Produce a binary artifact and place it in the mounted volume
-          run: |
-            echo " * Make Git happy"
-            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples
-            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples/Kore
-            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples/Kore/Tools/linux_arm
-            git config --global --add safe.directory /home/runner/work/Kore-Samples/Kore-Samples/Kore/Tools/linux_arm64
-            echo " * Get Submodules"
-            ./get_dlc
-            echo " * Compile Shader"
-            cd Shader
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile Texture"
-            cd Texture
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile MultiWindow"
-            cd MultiWindow
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile ComputeShader"
-            cd ComputeShader
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile TextureArray"
-            cd TextureArray
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile ShaderG5"
-            cd ShaderG5
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 00_empty"
-            cd 00_empty
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 01_triangle"
-            cd 01_triangle
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 02_matrix"
-            cd 02_matrix
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 03_colored_cube"
-            cd 03_colored_cube
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 04_textured_cube"
-            cd 04_textured_cube
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 05_camera_controls"
-            cd 05_camera_controls
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 06_render_targets"
-            cd 06_render_targets
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 07_multiple_render_targets"
-            cd 07_multiple_render_targets
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 08_float_render_targets"
-            cd 08_float_render_targets
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 09_depth_render_targets"
-            cd 09_depth_render_targets
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 10_cubemap"
-            cd 10_cubemap
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 11_instanced_rendering"
-            cd 11_instanced_rendering
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 12_set_render_target_depth"
-            cd 12_set_render_target_depth
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 13_generate_mipmaps"
-            cd 13_generate_mipmaps
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 14_set_mipmap"
-            cd 14_set_mipmap
-            ../Kore/make -g opengl --compile
-            cd ..
-            echo " * Compile 15_deinterleaved_buffers"
-            cd 15_deinterleaved_buffers
-            ../Kore/make -g opengl --compile
-            cd ..
+    - name: Compile Shader
+      working-directory: Shader
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile Texture
+      working-directory: Texture
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile MultiWindow
+      working-directory: MultiWindow
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile ComputeShader
+      working-directory: ComputeShader
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile TextureArray
+      working-directory: TextureArray
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile ShaderG5
+      working-directory: ShaderG5
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 00_empty
+      working-directory: 00_empty
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 01_triangle
+      working-directory: 01_triangle
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 02_matrix
+      working-directory: 02_matrix
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 03_colored_cube
+      working-directory: 03_colored_cube
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 04_textured_cube
+      working-directory: 04_textured_cube
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 05_camera_controls
+      working-directory: 05_camera_controls
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 06_render_targets
+      working-directory: 06_render_targets
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 07_multiple_render_targets
+      working-directory: 07_multiple_render_targets
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 08_float_render_targets
+      working-directory: 08_float_render_targets
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 09_depth_render_targets
+      working-directory: 09_depth_render_targets
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 10_cubemap
+      working-directory: 10_cubemap
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 11_instanced_rendering
+      working-directory: 11_instanced_rendering
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 12_set_render_target_depth
+      working-directory: 12_set_render_target_depth
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 13_generate_mipmaps
+      working-directory: 13_generate_mipmaps
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 14_set_mipmap
+      working-directory: 14_set_mipmap
+      run: ../Kore/make linux -g opengl --compile
+    - name: Compile 15_deinterleaved_buffers
+      working-directory: 15_deinterleaved_buffers
+      run: ../Kore/make linux -g opengl --compile
