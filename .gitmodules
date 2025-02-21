@@ -1,7 +1,3 @@
-[submodule "Kinc"]
-	path = Kinc
-	url = https://github.com/Kode/Kinc.git
-	branch = main
 [submodule "RuntimeShaderCompilation/krafix"]
 	path = RuntimeShaderCompilation/krafix
 	url = https://github.com/Kode/krafix.git
