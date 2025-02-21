@@ -1,6 +1,6 @@
 const project = new Project('TextureTest');
 
-await project.addProject('../Kinc', {kong: true, kope: true});
+await project.addProject('../Kore', {kong: true, kope: true});
 
 project.addFile('Sources/**');
 project.addKongDir('Shaders');

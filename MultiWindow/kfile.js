@@ -1,6 +1,6 @@
 const project = new Project('MultiWindow');
 
-await project.addProject('../Kinc');
+await project.addProject('../Kore');
 
 project.addFile('Sources/**');
 project.addFile('Shaders/**');

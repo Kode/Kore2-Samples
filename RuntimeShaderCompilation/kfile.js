@@ -5,7 +5,7 @@ const project = new Project('ShaderTest');
 const krafix = await project.addProject('krafix');
 krafix.useAsLibrary();
 
-await project.addProject('../Kinc');
+await project.addProject('../Kore');
 
 project.addFile('Sources/**');
 project.setDebugDir('Deployment');
