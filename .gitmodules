@@ -1,3 +1,7 @@
+[submodule "Kore"]
+	path = Kore
+	url = https://github.com/Kode/Kore.git
+	branch = v2
 [submodule "RuntimeShaderCompilation/krafix"]
 	path = RuntimeShaderCompilation/krafix
 	url = https://github.com/Kode/krafix.git
