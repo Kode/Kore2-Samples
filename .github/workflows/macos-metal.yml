@@ -22,7 +22,7 @@ jobs:
 
     - name: Compile shader
       working-directory: shader
-      run: ../Kinc/make osx -g metal --option screenshot --debug --run
+      run: ../Kore/make osx -g metal --option screenshot --debug --run
     - name: Check shader
       working-directory: shader
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png

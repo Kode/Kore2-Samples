@@ -28,7 +28,7 @@ jobs:
 
     - name: Compile 15_deinterleaved_buffers
       working-directory: 15_deinterleaved_buffers
-      run: ../Kinc/make windows -v vs2022 -g vulkan --option screenshot --debug --run
+      run: ../Kore/make windows -v vs2022 -g vulkan --option screenshot --debug --run
     - name: Check 15_deinterleaved_buffers
       working-directory: 15_deinterleaved_buffers
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
