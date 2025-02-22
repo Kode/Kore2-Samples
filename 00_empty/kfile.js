@@ -1,10 +1,10 @@
 const project = new Project('Example');
 
-await project.addProject('../Kore', {kong: true, kope: true});
+await project.addProject('../kore', {kong: true, kope: true});
 
-project.addFile('Sources/**');
-project.addKongDir('Shaders');
-project.setDebugDir('Deployment');
+project.addFile('sources/**');
+project.addKongDir('shaders');
+project.setDebugDir('deployment');
 
 if (Options.screenshot) {
 	project.addDefine('SCREENSHOT');
