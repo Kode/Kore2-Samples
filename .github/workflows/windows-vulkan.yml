@@ -26,17 +26,17 @@ jobs:
     - name: Get Submodules
       run: ./get_dlc
 
-    - name: Compile 15_deinterleaved_buffers
-      working-directory: 15_deinterleaved_buffers
+    - name: Compile shader
+      working-directory: shader
       run: ../Kore/make windows -v vs2022 -g vulkan --option screenshot --debug --run
-    - name: Check 15_deinterleaved_buffers
-      working-directory: 15_deinterleaved_buffers
+    - name: Check shader
+      working-directory: shader
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  15_deinterleaved_buffers failure image
+    - name: Upload  shader failure image
       if: failure()
       uses: actions/upload-artifact@v4
       with:
-        name: 15_deinterleaved_buffers image
-        path: 15_deinterleaved_buffers/Deployment/test.png
+        name: shader image
+        path: shader/Deployment/test.png
       env:
         VULKAN_SDK: C:\VulkanSDK\1.3.275.0
