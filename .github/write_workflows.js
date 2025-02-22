@@ -117,11 +117,11 @@ ${postfixSteps}
     const sys = workflow.sys === 'macOS' ? 'osx' : (workflow.sys === 'UWP' ? 'windowsapp' : workflow.sys.toLowerCase());
     const vs = workflow.vs ? ' -v ' + workflow.vs : '';
 
-    if (workflow.sys === 'Windows') {
+    if (workflow.sys === 'Windows' && workflow.gfx === 'Direct3D 12') {
       workflowText +=
 `    - name: Copy WARP
       working-directory: ${sample}
-      run: echo F|xcopy D:\\a\\KopeKong-Samples\\KopeKong-Samples\\Microsoft.Direct3D.WARP.1.0.13\\build\\native\\bin\\x64\\d3d10warp.dll Deployment\\d3d10warp.dll
+      run: echo F|xcopy D:\\a\\Kore-Samples\\Kore-Samples\\Microsoft.Direct3D.WARP.1.0.13\\build\\native\\bin\\x64\\d3d10warp.dll Deployment\\d3d10warp.dll
 `;
     }
 
