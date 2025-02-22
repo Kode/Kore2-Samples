@@ -3,10 +3,10 @@ name: Windows (Direct3D 12)
 on:
   push:
     branches:
-    - main
+    - v3
   pull_request:
     branches:
-    - main
+    - v3
 
 jobs:
   build:
@@ -22,96 +22,6 @@ jobs:
     - name: Get Submodules
       run: ./get_dlc
 
-    - name: Copy WARP
-      working-directory: Shader
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
-    - name: Compile Shader
-      working-directory: Shader
-      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
-    - name: Check Shader
-      working-directory: Shader
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  Shader failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: Shader image
-        path: Shader/Deployment/test.png
-    - name: Copy WARP
-      working-directory: Texture
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
-    - name: Compile Texture
-      working-directory: Texture
-      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
-    - name: Check Texture
-      working-directory: Texture
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  Texture failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: Texture image
-        path: Texture/Deployment/test.png
-    - name: Copy WARP
-      working-directory: ComputeShader
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
-    - name: Compile ComputeShader
-      working-directory: ComputeShader
-      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
-    - name: Check ComputeShader
-      working-directory: ComputeShader
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  ComputeShader failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: ComputeShader image
-        path: ComputeShader/Deployment/test.png
-    - name: Copy WARP
-      working-directory: TextureArray
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
-    - name: Compile TextureArray
-      working-directory: TextureArray
-      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
-    - name: Check TextureArray
-      working-directory: TextureArray
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  TextureArray failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: TextureArray image
-        path: TextureArray/Deployment/test.png
-    - name: Copy WARP
-      working-directory: Raytracing
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
-    - name: Compile Raytracing
-      working-directory: Raytracing
-      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
-    - name: Check Raytracing
-      working-directory: Raytracing
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  Raytracing failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: Raytracing image
-        path: Raytracing/Deployment/test.png
-    - name: Copy WARP
-      working-directory: Bindless
-      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
-    - name: Compile Bindless
-      working-directory: Bindless
-      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
-    - name: Check Bindless
-      working-directory: Bindless
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  Bindless failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: Bindless image
-        path: Bindless/Deployment/test.png
     - name: Copy WARP
       working-directory: 00_empty
       run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
@@ -352,3 +262,93 @@ jobs:
       with:
         name: 15_deinterleaved_buffers image
         path: 15_deinterleaved_buffers/Deployment/test.png
+    - name: Copy WARP
+      working-directory: shader
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
+    - name: Compile shader
+      working-directory: shader
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check shader
+      working-directory: shader
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  shader failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: shader image
+        path: shader/Deployment/test.png
+    - name: Copy WARP
+      working-directory: texture
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
+    - name: Compile texture
+      working-directory: texture
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check texture
+      working-directory: texture
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  texture failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: texture image
+        path: texture/Deployment/test.png
+    - name: Copy WARP
+      working-directory: computeshader
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
+    - name: Compile computeshader
+      working-directory: computeshader
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check computeshader
+      working-directory: computeshader
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  computeshader failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: computeshader image
+        path: computeshader/Deployment/test.png
+    - name: Copy WARP
+      working-directory: texturearray
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
+    - name: Compile texturearray
+      working-directory: texturearray
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check texturearray
+      working-directory: texturearray
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  texturearray failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: texturearray image
+        path: texturearray/Deployment/test.png
+    - name: Copy WARP
+      working-directory: raytracing
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
+    - name: Compile raytracing
+      working-directory: raytracing
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check raytracing
+      working-directory: raytracing
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  raytracing failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: raytracing image
+        path: raytracing/Deployment/test.png
+    - name: Copy WARP
+      working-directory: bindless
+      run: echo F|xcopy D:\a\KopeKong-Samples\KopeKong-Samples\Microsoft.Direct3D.WARP.1.0.13\build\native\bin\x64\d3d10warp.dll Deployment\d3d10warp.dll
+    - name: Compile bindless
+      working-directory: bindless
+      run: ../Kinc/make windows -v vs2022 -g direct3d12 --option screenshot --debug --run
+    - name: Check bindless
+      working-directory: bindless
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  bindless failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: bindless image
+        path: bindless/Deployment/test.png
