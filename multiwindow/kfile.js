@@ -1,14 +1,14 @@
 const project = new Project('MultiWindow');
 
-await project.addProject('../Kore');
+await project.addProject(findKore());
 
-project.addFile('Sources/**');
-project.addFile('Shaders/**');
-project.setDebugDir('Deployment');
+project.addFile('sources/**');
+project.addFile('shaders/**');
+project.setDebugDir('deployment');
 
 if (Options.screenshot) {
 	project.addDefine('SCREENSHOT');
-	project.addDefine('KOPE_D3D12_FORCE_WARP');
+	project.addDefine('KORE_D3D12_FORCE_WARP');
 }
 
 project.flatten();

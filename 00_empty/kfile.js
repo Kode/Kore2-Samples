@@ -1,4 +1,4 @@
-const project = new Project('Example');
+const project = new Project('Empty');
 
 await project.addProject(findKore());
 

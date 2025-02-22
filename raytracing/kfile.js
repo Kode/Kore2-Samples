@@ -1,10 +1,10 @@
 const project = new Project('Raytracing');
 
-await project.addProject('../Kore', {kong: true, kope: true});
+await project.addProject(findKore());
 
-project.addFile('Sources/**');
-project.addKongDir('Shaders');
-project.setDebugDir('Deployment');
+project.addFile('sources/**');
+project.addKongDir('shaders');
+project.setDebugDir('deployment');
 
 /*project.addIncludeDir('../nvapi');
 project.addLib('../nvapi/amd64/nvapi64');
@@ -12,7 +12,7 @@ project.addDefine('KOPE_NVAPI');*/
 
 if (Options.screenshot) {
 	project.addDefine('SCREENSHOT');
-	project.addDefine('KOPE_D3D12_FORCE_WARP');
+	project.addDefine('KORE_D3D12_FORCE_WARP');
 }
 
 project.flatten();
