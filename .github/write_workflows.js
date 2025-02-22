@@ -76,7 +76,7 @@ ${java}
 ${steps}
 `;
 
-if (workflow.sys === 'Windows') {
+if (workflow.sys === 'Windows' && workflow.gfx === 'Direct3D 12') {
     workflowText +=
 `    - name: Install WARP 1.0.13
       run: nuget install Microsoft.Direct3D.WARP
@@ -129,7 +129,14 @@ ${postfixSteps}
 `    - name: Compile ${sample}
       working-directory: ${sample}
       run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --option screenshot --debug --run${postfix}
-    - name: Check ${sample}
+`;
+ 
+    if (workflow.env) {
+      workflowText += workflow.env;
+    }
+ 
+    workflowText +=
+`    - name: Check ${sample}
       working-directory: ${sample}
       run: magick compare -metric mae .\\reference.png .\\Deployment\\test.png difference.png
     - name: Upload  ${sample} failure image
@@ -139,9 +146,6 @@ ${postfixSteps}
         name: ${sample} image
         path: ${sample}/Deployment/test.png
 `;
-    if (workflow.env) {
-      workflowText += workflow.env;
-    }
   }
 
   const name = workflow.gfx ? (workflow.sys.toLowerCase() + '-' + workflow.gfx.toLowerCase().replace(/ /g, '')) : workflow.sys.toLowerCase();
