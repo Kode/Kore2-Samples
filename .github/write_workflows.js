@@ -168,14 +168,16 @@ const workflows = [
     gfx: 'OpenGL',
     runsOn: 'ubuntu-latest',
     java: true
-  },
+  },*/
   {
     sys: 'Android',
     gfx: 'Vulkan',
     runsOn: 'ubuntu-latest',
-    java: true
+    java: true,
+    canExecute: false,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
-  {
+  /*{
     sys: 'Emscripten',
     gfx: 'WebGL',
     runsOn: 'ubuntu-latest',
