@@ -128,14 +128,20 @@ ${postfixSteps}
     workflowText +=
 `    - name: Compile ${sample}
       working-directory: ${sample}
-      run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --option screenshot --debug --run${postfix}
-`;
- 
+      run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --option screenshot --debug`;
+
+    if (workflow.canExecute) {
+      workflowText += ' --run';
+    }
+
+    workflowText += postfix + '\n';
+
     if (workflow.env) {
       workflowText += workflow.env;
     }
  
-    workflowText +=
+    if (workflow.canExecute) {
+      workflowText +=
 `    - name: Check ${sample}
       working-directory: ${sample}
       run: magick compare -metric mae .\\reference.png .\\Deployment\\test.png difference.png
@@ -146,6 +152,7 @@ ${postfixSteps}
         name: ${sample} image
         path: ${sample}/Deployment/test.png
 `;
+    }
   }
 
   const name = workflow.gfx ? (workflow.sys.toLowerCase() + '-' + workflow.gfx.toLowerCase().replace(/ /g, '')) : workflow.sys.toLowerCase();
@@ -245,6 +252,7 @@ const workflows = [
     sys: 'macOS',
     gfx: 'Metal',
     runsOn: 'macOS-latest',
+    canExecute: false,
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
   /*{
@@ -279,6 +287,7 @@ const workflows = [
     sys: 'Windows',
     gfx: 'Direct3D 12',
     runsOn: 'windows-latest',
+    canExecute: true,
     vs: 'vs2022',
     checked: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
   },/*
@@ -292,6 +301,7 @@ const workflows = [
     sys: 'Windows',
     gfx: 'Vulkan',
     runsOn: 'windows-latest',
+    canExecute: true,
     vs: 'vs2022',
     env:
 `      env:
