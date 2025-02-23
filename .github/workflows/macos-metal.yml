@@ -22,4 +22,4 @@ jobs:
 
     - name: Compile shader
       working-directory: shader
-      run: ../Kore/make osx -g metal --option screenshot --debug
+      run: ../Kore/make osx -g metal --option screenshot --debug --compile

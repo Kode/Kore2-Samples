@@ -133,6 +133,9 @@ ${postfixSteps}
     if (workflow.canExecute) {
       workflowText += ' --run';
     }
+    else {
+      workflowText += ' --compile';
+    }
 
     workflowText += postfix + '\n';
 
