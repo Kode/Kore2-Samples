@@ -1,6 +1,5 @@
-#include <kinc/io/filereader.h>
-#include <kinc/system.h>
 #include <kore3/gpu/device.h>
+#include <kore3/system.h>
 
 #include <kong.h>
 
@@ -59,8 +58,8 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Example", width, height, NULL, NULL);
-	kinc_set_update_callback(update, NULL);
+	kore_init("Example", width, height, NULL, NULL);
+	kore_set_update_callback(update, NULL);
 
 	kore_gpu_device_wishlist wishlist = {0};
 	kore_gpu_device_create(&device, &wishlist);
@@ -69,7 +68,7 @@ int kickstart(int argc, char **argv) {
 
 	kore_gpu_device_create_command_list(&device, KORE_GPU_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
-	kinc_start();
+	kore_start();
 
 	return 0;
 }
