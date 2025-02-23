@@ -289,7 +289,7 @@ const workflows = [
     runsOn: 'windows-latest',
     canExecute: true,
     vs: 'vs2022',
-    checked: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    checked: [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },/*
   {
     sys: 'Windows',
@@ -313,7 +313,7 @@ const workflows = [
           Invoke-WebRequest -Uri "https://sdk.lunarg.com/sdk/download/1.3.275.0/windows/VulkanSDK-1.3.275.0-Installer.exe" -OutFile VulkanSDK.exe
           $installer = Start-Process -FilePath VulkanSDK.exe -Wait -PassThru -ArgumentList @("--da", "--al", "-c", "in");
           $installer.WaitForExit();`,
-    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   }
 ];
 
