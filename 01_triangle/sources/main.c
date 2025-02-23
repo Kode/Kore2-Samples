@@ -34,7 +34,7 @@ static void update(void *data) {
 	parameters.color_attachments[0].texture.texture = framebuffer;
 	parameters.color_attachments[0].texture.array_layer_count = 1;
 	parameters.color_attachments[0].texture.mip_level_count = 1;
-	parameters.color_attachments[0].texture.format = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.format = kore_gpu_device_framebuffer_format(&device);
 	parameters.color_attachments[0].texture.dimension = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D;
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
