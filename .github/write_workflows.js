@@ -128,7 +128,7 @@ ${postfixSteps}
     workflowText +=
 `    - name: Compile ${sample}
       working-directory: ${sample}
-      run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --debug`;
+      run: ${prefix}../kore/make ${sys}${vs}${gfx}${options} --debug`;
 
     if (workflow.canExecute) {
       workflowText += ' --option screenshot --run';

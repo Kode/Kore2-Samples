@@ -27,4 +27,4 @@ jobs:
 
     - name: Compile shader
       working-directory: shader
-      run: ../Kore/make android -g vulkan --debug --compile
+      run: ../kore/make android -g vulkan --debug --compile
