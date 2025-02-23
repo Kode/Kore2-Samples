@@ -1,4 +1,4 @@
-name: macOS (Metal)
+name: iOS (Metal)
 
 on:
   push:
@@ -22,4 +22,4 @@ jobs:
 
     - name: Compile shader
       working-directory: shader
-      run: ../Kore/make osx -g metal --debug --compile
+      run: ../Kore/make ios -g metal --nosigning --debug --compile

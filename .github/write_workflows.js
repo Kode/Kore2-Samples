@@ -128,10 +128,10 @@ ${postfixSteps}
     workflowText +=
 `    - name: Compile ${sample}
       working-directory: ${sample}
-      run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --option screenshot --debug`;
+      run: ${prefix}../Kore/make ${sys}${vs}${gfx}${options} --debug`;
 
     if (workflow.canExecute) {
-      workflowText += ' --run';
+      workflowText += ' --option screenshot --run';
     }
     else {
       workflowText += ' --compile';
@@ -205,13 +205,15 @@ const workflows = [
     sys: 'FreeBSD',
     gfx: 'OpenGL',
     runsOn: 'macos-12'
-  },
+  },*/
   {
     sys: 'iOS',
     gfx: 'Metal',
     runsOn: 'macOS-latest',
-    options: '--nosigning'
-  },
+    options: '--nosigning',
+    canExecute: false,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
+  },/*
   {
     sys: 'iOS',
     gfx: 'OpenGL',
