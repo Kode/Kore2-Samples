@@ -190,12 +190,19 @@ const workflows = [
 `,
     noCompute: true,
     noTexArray: true
-  },
+  },*/
   {
     sys: 'Emscripten',
     gfx: 'WebGPU',
     runsOn: 'ubuntu-latest',
-    steps: '',
+    canExecute: false,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    steps:
+`    - name: Apt Update
+      run: sudo apt update
+    - name: Apt Install
+      run: sudo apt install ninja-build
+`,
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
     compilePostfix: ' && cd build/Release && make',
     postfixSteps:
@@ -203,11 +210,33 @@ const workflows = [
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
 `
   },
-  {
-    sys: 'FreeBSD',
-    gfx: 'OpenGL',
-    runsOn: 'macos-12'
+    /*{
+    sys: 'Web Assembly',
+    gfx: 'WebGL',
+    runsOn: 'ubuntu-latest',
+    steps: '',
+    compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
+    compilePostfix: ' && cd build/Release && make',
+    postfixSteps:
+`    - name: Setup emscripten
+      run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
+`,
+    noCompute: true,
+    noTexArray: true
   },*/
+  {
+    sys: 'Web Assembly',
+    gfx: 'WebGPU',
+    runsOn: 'ubuntu-latest',
+    canExecute: false,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    steps:
+`    - name: Apt Update
+      run: sudo apt update
+    - name: Apt Install
+      run: sudo apt install ninja-build
+`
+  },
   {
     sys: 'iOS',
     gfx: 'Metal',
