@@ -114,7 +114,21 @@ ${postfixSteps}
     const postfix = workflow.compilePostfix ?? '';
     const gfx = workflow.gfx ? ((workflow.gfx === 'WebGL') ? ' -g opengl' : ' -g ' + workflow.gfx.toLowerCase().replace(/ /g, '')) : '';
     const options = workflow.options ? ' ' + workflow.options : '';
-    const sys = workflow.sys === 'macOS' ? 'osx' : (workflow.sys === 'UWP' ? 'windowsapp' : workflow.sys.toLowerCase());
+    let sys = null;
+    switch (workflow.sys) {
+    case 'macOS':
+      sys = 'osx';
+      break;
+    case 'UWP':
+      sys = 'windowsapp';
+      break;
+    case 'Web Assembly':
+      sys = 'wasm';
+      break;
+    default:
+      sys = workflow.sys.toLowerCase();
+      break;
+    }
     const vs = workflow.vs ? ' -v ' + workflow.vs : '';
 
     if (workflow.sys === 'Windows' && workflow.gfx === 'Direct3D 12') {
@@ -183,7 +197,7 @@ const workflows = [
     runsOn: 'ubuntu-latest',
     steps: '',
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Release && make',
+    compilePostfix: ' && cd build/Debug && make',
     postfixSteps:
 `    - name: Setup emscripten
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
@@ -204,7 +218,7 @@ const workflows = [
       run: sudo apt install ninja-build
 `,
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Release && make',
+    compilePostfix: ' && cd build/Debug && make',
     postfixSteps:
 `    - name: Setup emscripten
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest

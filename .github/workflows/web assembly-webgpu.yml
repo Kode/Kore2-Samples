@@ -26,4 +26,4 @@ jobs:
 
     - name: Compile shader
       working-directory: shader
-      run: ../kore/make web assembly -g webgpu --debug --compile
+      run: ../kore/make wasm -g webgpu --debug --compile
