@@ -239,11 +239,13 @@ const workflows = [
       run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `,
     RuntimeShaderCompilation: true
-  },
+  },*/
   {
     sys: 'Linux',
     gfx: 'Vulkan',
     runsOn: 'ubuntu-latest',
+    canExecute: false,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
     steps:
 `    - name: Get LunarG key
       run: wget -qO- https://packages.lunarg.com/lunarg-signing-key-pub.asc | sudo tee /etc/apt/trusted.gpg.d/lunarg.asc
@@ -255,7 +257,7 @@ const workflows = [
       run: sudo apt install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev vulkan-sdk libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `
   },
-  */{
+  {
     sys: 'macOS',
     gfx: 'Metal',
     runsOn: 'macOS-latest',
