@@ -31,12 +31,7 @@ const samples = [
 const workflowsDir = path.join('workflows');
 
 function writeWorkflow(workflow) {
-  if (workflow.sys === 'FreeBSD') {
-    writeFreeBSDWorkflow(workflow);
-    return;
-  }
-  if (workflow.sys === 'Linux' && workflow.cpu === 'ARM') {
-    writeLinuxArmWorkflow(workflow);
+  if (!workflow.active) {
     return;
   }
 
@@ -172,26 +167,30 @@ ${postfixSteps}
     }
   }
 
-  const name = workflow.gfx ? (workflow.sys.toLowerCase() + '-' + workflow.gfx.toLowerCase().replace(/ /g, '')) : workflow.sys.toLowerCase();
+  let name = workflow.sys.toLowerCase().replace(/ /g, '');
+  if (workflow.gfx) {
+    name += '-' + workflow.gfx.toLowerCase().replace(/ /g, '');
+  }
   fs.writeFileSync(path.join(workflowsDir, name + '.yml'), workflowText, {encoding: 'utf8'});
 }
 
 const workflows = [
-  /*{
+  {
     sys: 'Android',
     gfx: 'OpenGL',
     runsOn: 'ubuntu-latest',
     java: true
-  },*/
+  },
   {
     sys: 'Android',
     gfx: 'Vulkan',
+    active: true,
     runsOn: 'ubuntu-latest',
     java: true,
     canExecute: false,
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
-  /*{
+  {
     sys: 'Emscripten',
     gfx: 'WebGL',
     runsOn: 'ubuntu-latest',
@@ -204,10 +203,11 @@ const workflows = [
 `,
     noCompute: true,
     noTexArray: true
-  },*/
+  },
   {
     sys: 'Emscripten',
     gfx: 'WebGPU',
+    active: true,
     runsOn: 'ubuntu-latest',
     canExecute: false,
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
@@ -224,7 +224,7 @@ const workflows = [
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
 `
   },
-    /*{
+    {
     sys: 'Web Assembly',
     gfx: 'WebGL',
     runsOn: 'ubuntu-latest',
@@ -237,7 +237,7 @@ const workflows = [
 `,
     noCompute: true,
     noTexArray: true
-  },*/
+  },
   {
     sys: 'Web Assembly',
     gfx: 'WebGPU',
@@ -254,11 +254,12 @@ const workflows = [
   {
     sys: 'iOS',
     gfx: 'Metal',
+    active: true,
     runsOn: 'macOS-latest',
     options: '--nosigning',
     canExecute: false,
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
-  },/*
+  },
   {
     sys: 'iOS',
     gfx: 'OpenGL',
@@ -282,10 +283,11 @@ const workflows = [
       run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `,
     RuntimeShaderCompilation: true
-  },*/
+  },
   {
     sys: 'Linux',
     gfx: 'Vulkan',
+    active: true,
     runsOn: 'ubuntu-latest',
     canExecute: false,
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
@@ -303,11 +305,12 @@ const workflows = [
   {
     sys: 'macOS',
     gfx: 'Metal',
+    active: true,
     runsOn: 'macOS-latest',
     canExecute: false,
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
-  /*{
+  {
     sys: 'macOS',
     gfx: 'OpenGL',
     runsOn: 'macOS-latest'
@@ -334,24 +337,26 @@ const workflows = [
     runsOn: 'windows-latest',
     RuntimeShaderCompilation: true,
     vs: 'vs2022'
-  },*/
+  },
   {
     sys: 'Windows',
     gfx: 'Direct3D 12',
+    active: true,
     runsOn: 'windows-latest',
     canExecute: true,
     vs: 'vs2022',
     checked: [1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
-  },/*
+  },
   {
     sys: 'Windows',
     gfx: 'OpenGL',
     runsOn: 'windows-latest',
     vs: 'vs2022'
-  },*/
+  },
   {
     sys: 'Windows',
     gfx: 'Vulkan',
+    active: true,
     runsOn: 'windows-latest',
     canExecute: true,
     vs: 'vs2022',
