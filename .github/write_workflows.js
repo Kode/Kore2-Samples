@@ -196,7 +196,7 @@ const workflows = [
     runsOn: 'ubuntu-latest',
     steps: '',
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Debug && make',
+    compilePostfix: ' && cd build/debug && make',
     postfixSteps:
 `    - name: Setup emscripten
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
@@ -218,25 +218,25 @@ const workflows = [
       run: sudo apt install ninja-build
 `,
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Debug && make',
+    compilePostfix: ' && cd build/debug && make',
     postfixSteps:
 `    - name: Setup emscripten
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
 `
   },
-    {
+  {
     sys: 'Web Assembly',
     gfx: 'WebGL',
     runsOn: 'ubuntu-latest',
     steps: '',
-    compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Release && make',
-    postfixSteps:
-`    - name: Setup emscripten
-      run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
-`,
     noCompute: true,
-    noTexArray: true
+    noTexArray: true,
+    steps:
+`    - name: Apt Update
+      run: sudo apt update
+    - name: Apt Install
+      run: sudo apt install ninja-build
+`
   },
   {
     sys: 'Web Assembly',
