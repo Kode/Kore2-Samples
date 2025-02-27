@@ -178,8 +178,10 @@ const workflows = [
   {
     sys: 'Android',
     gfx: 'OpenGL',
+    active: true,
     runsOn: 'ubuntu-latest',
-    java: true
+    java: true,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Android',
@@ -193,7 +195,9 @@ const workflows = [
   {
     sys: 'Emscripten',
     gfx: 'WebGL',
+    active: true,
     runsOn: 'ubuntu-latest',
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     steps: '',
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
     compilePostfix: ' && cd build/debug && make',
@@ -227,10 +231,12 @@ const workflows = [
   {
     sys: 'Web Assembly',
     gfx: 'WebGL',
+    active: true,
     runsOn: 'ubuntu-latest',
     steps: '',
     noCompute: true,
     noTexArray: true,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     steps:
 `    - name: Apt Update
       run: sudo apt update
@@ -243,7 +249,7 @@ const workflows = [
     gfx: 'WebGPU',
     runsOn: 'ubuntu-latest',
     canExecute: false,
-    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0],
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     steps:
 `    - name: Apt Update
       run: sudo apt update
@@ -263,18 +269,23 @@ const workflows = [
   {
     sys: 'iOS',
     gfx: 'OpenGL',
+    active: true,
     runsOn: 'macOS-latest',
     options: '--nosigning',
-    noCompute: true
+    noCompute: true,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Linux',
     gfx: 'OpenGL',
-    cpu: 'ARM'
+    cpu: 'ARM',
+    active: true,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Linux',
     gfx: 'OpenGL',
+    active: true,
     runsOn: 'ubuntu-latest',
     steps:
 `    - name: Apt Update
@@ -282,7 +293,8 @@ const workflows = [
     - name: Apt Install
       run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
 `,
-    RuntimeShaderCompilation: true
+    RuntimeShaderCompilation: true,
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Linux',
@@ -313,30 +325,25 @@ const workflows = [
   {
     sys: 'macOS',
     gfx: 'OpenGL',
-    runsOn: 'macOS-latest'
+    active: true,
+    runsOn: 'macOS-latest',
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'UWP',
+    active: true,
     runsOn: 'windows-latest',
-    vs: 'vs2022'
-  },
-  {
-    sys: 'Windows',
-    gfx: 'Direct3D 9',
-    runsOn: 'windows-latest',
-    noCompute: true,
-    noTexArray: true,
     vs: 'vs2022',
-    postfixSteps:
-`    - name: Install DirectX
-      run: choco install -y directx --no-progress`
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Windows',
     gfx: 'Direct3D 11',
+    active: true,
     runsOn: 'windows-latest',
     RuntimeShaderCompilation: true,
-    vs: 'vs2022'
+    vs: 'vs2022',
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Windows',
@@ -350,8 +357,10 @@ const workflows = [
   {
     sys: 'Windows',
     gfx: 'OpenGL',
+    active: true,
     runsOn: 'windows-latest',
-    vs: 'vs2022'
+    vs: 'vs2022',
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
   },
   {
     sys: 'Windows',

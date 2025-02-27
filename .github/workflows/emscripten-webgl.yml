@@ -1,0 +1,24 @@
+name: Emscripten (WebGL)
+
+on:
+  push:
+    branches:
+    - v3
+  pull_request:
+    branches:
+    - v3
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+
+    - name: Get Submodules
+      run: ./get_dlc
+    - name: Setup emscripten
+      run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
+
