@@ -141,7 +141,7 @@ ${postfixSteps}
 
     if (workflow.canExecute) {
       if (workflow.xvfb) {
-        workflowText += ' --option screenshot\n';
+        workflowText += ' --option screenshot --compile\n';
         workflowText +=
 `    - name: Run ${sample}
       working-directory: ${sample}/deployment
