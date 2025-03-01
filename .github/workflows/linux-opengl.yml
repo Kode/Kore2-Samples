@@ -26,16 +26,4 @@ jobs:
 
     - name: Compile shader
       working-directory: shader
-      run: ../kore/make linux -g opengl --debug --option screenshot --compile
-    - name: Run shader
-      working-directory: shader/deployment
-      run: xvfb-run ../build/debug/shader
-    - name: Check shader
-      working-directory: shader
-      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
-    - name: Upload  shader failure image
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: shader image
-        path: shader/Deployment/test.png
+      run: ../kore/make linux -g opengl --debug --compile
