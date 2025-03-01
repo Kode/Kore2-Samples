@@ -1,4 +1,4 @@
-const project = new Project('ShaderTest');
+const project = new Project('shader');
 
 await project.addProject(findKore());
 
