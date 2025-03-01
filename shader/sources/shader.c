@@ -61,11 +61,11 @@ static void update(void *data) {
 
 	kore_gpu_command_list_present(&list);
 
-	kore_gpu_device_execute_command_list(&device, &list);
-
 #ifdef SCREENSHOT
 	screenshot_take(&device, &list, framebuffer, width, height);
 #endif
+
+	kore_gpu_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
