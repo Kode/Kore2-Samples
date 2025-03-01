@@ -28,8 +28,8 @@ jobs:
       working-directory: shader
       run: ../kore/make linux -g opengl --debug --option screenshot
     - name: Run shader
-      working-directory: ./shader/deployment
-      run: xvfb-run build/debug/shader
+      working-directory: shader/deployment
+      run: xvfb-run ../build/debug/shader
     - name: Check shader
       working-directory: shader
       run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
