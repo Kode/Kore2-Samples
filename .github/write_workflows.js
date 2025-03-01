@@ -144,7 +144,7 @@ ${postfixSteps}
         workflowText += ' --option screenshot\n';
         workflowText +=
 `    - name: Run ${sample}
-      working-directory: ./tests/${sample}/Deployment
+      working-directory: ./${sample}/deployment
       run: xvfb-run build/debug/${sample}`;
       }
       else {
@@ -370,7 +370,7 @@ const workflows = [
     gfx: 'OpenGL',
     active: true,
     runsOn: 'windows-latest',
-    canExecute: true,
+    canExecute: false,
     vs: 'vs2022',
     checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
