@@ -19,8 +19,23 @@ jobs:
     - name: Apt Update
       run: sudo apt update
     - name: Apt Install
-      run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
+      run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build imagemagick xvfb --yes --quiet
 
     - name: Get Submodules
       run: ./get_dlc
 
+    - name: Compile shader
+      working-directory: shader
+      run: ../kore/make linux -g opengl --debug --option screenshot
+    - name: Run shader
+      working-directory: ./tests/shader/Deployment
+      run: xvfb-run build/debug/shader
+    - name: Check shader
+      working-directory: shader
+      run: magick compare -metric mae .\reference.png .\Deployment\test.png difference.png
+    - name: Upload  shader failure image
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: shader image
+        path: shader/Deployment/test.png

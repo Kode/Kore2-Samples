@@ -140,7 +140,16 @@ ${postfixSteps}
       run: ${prefix}../kore/make ${sys}${vs}${gfx}${options} --debug`;
 
     if (workflow.canExecute) {
-      workflowText += ' --option screenshot --run';
+      if (workflow.xvfb) {
+        workflowText += ' --option screenshot\n';
+        workflowText +=
+`    - name: Run ${sample}
+      working-directory: ./tests/${sample}/Deployment
+      run: xvfb-run build/debug/${sample}`;
+      }
+      else {
+        workflowText += ' --option screenshot --run';
+      }
     }
     else {
       workflowText += ' --compile';
@@ -287,14 +296,16 @@ const workflows = [
     gfx: 'OpenGL',
     active: true,
     runsOn: 'ubuntu-latest',
+    canExecute: true,
+    xvfb: true,
     steps:
 `    - name: Apt Update
       run: sudo apt update
     - name: Apt Install
-      run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build --yes --quiet
+      run: sudo apt-get install libasound2-dev libxinerama-dev libxrandr-dev libgl1-mesa-dev libxi-dev libxcursor-dev libudev-dev libwayland-dev wayland-protocols libxkbcommon-dev ninja-build imagemagick xvfb --yes --quiet
 `,
     RuntimeShaderCompilation: true,
-    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
   {
     sys: 'Linux',
@@ -359,8 +370,9 @@ const workflows = [
     gfx: 'OpenGL',
     active: true,
     runsOn: 'windows-latest',
+    canExecute: true,
     vs: 'vs2022',
-    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    checked: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0]
   },
   {
     sys: 'Windows',
