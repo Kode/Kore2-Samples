@@ -144,8 +144,8 @@ ${postfixSteps}
         workflowText += ' --option screenshot\n';
         workflowText +=
 `    - name: Run ${sample}
-      working-directory: ./${sample}/deployment
-      run: xvfb-run build/debug/${sample}`;
+      working-directory: ${sample}/deployment
+      run: xvfb-run ../build/debug/${sample}`;
       }
       else {
         workflowText += ' --option screenshot --run';
