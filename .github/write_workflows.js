@@ -167,7 +167,7 @@ ${postfixSteps}
       workflowText +=
 `    - name: Check ${sample}
       working-directory: ${sample}
-      run: ${magickCommand} -metric mae .\\reference.png .\\Deployment\\test.png difference.png
+      run: ${magickCommand} -metric mae ./reference.png ./deployment/test.png difference.png
     - name: Upload  ${sample} failure image
       if: failure()
       uses: actions/upload-artifact@v4
