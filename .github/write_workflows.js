@@ -160,12 +160,14 @@ ${postfixSteps}
     if (workflow.env) {
       workflowText += workflow.env;
     }
+
+    const magickCommand = workflow.sys === 'Linux' ? 'compare-im6' : 'magick compare';
  
     if (workflow.canExecute) {
       workflowText +=
 `    - name: Check ${sample}
       working-directory: ${sample}
-      run: magick compare -metric mae .\\reference.png .\\Deployment\\test.png difference.png
+      run: ${magickCommand} -metric mae .\\reference.png .\\Deployment\\test.png difference.png
     - name: Upload  ${sample} failure image
       if: failure()
       uses: actions/upload-artifact@v4
