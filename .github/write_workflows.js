@@ -296,7 +296,7 @@ const workflows = [
     gfx: 'OpenGL',
     active: true,
     runsOn: 'ubuntu-latest',
-    canExecute: false,
+    canExecute: true,
     xvfb: true,
     steps:
 `    - name: Apt Update
