@@ -95,7 +95,7 @@ int kickstart(int argc, char **argv) {
 
 #ifdef USE_BUFFER_IMAGE
 	const kore_gpu_buffer_parameters buffer_texture_parameters = {
-	    .size = 256 * 256 * 4,
+	    .size = 256 * 256 * sizeof(kore_float4),
 	    .usage_flags = KORE_GPU_BUFFER_USAGE_READ_WRITE,
 	};
 	kore_gpu_device_create_buffer(&device, &buffer_texture_parameters, &buffer_texture);
