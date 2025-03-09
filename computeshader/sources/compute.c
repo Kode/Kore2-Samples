@@ -130,21 +130,25 @@ int kickstart(int argc, char **argv) {
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
 		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
+
 		v[0].pos.x = -1.0f;
 		v[0].pos.y = -1.0f;
 		v[0].pos.z = 0.5f;
 		v[0].tex.x = 0.0f;
 		v[0].tex.y = 1.0f;
+
 		v[1].pos.x = 1.0f;
 		v[1].pos.y = -1.0f;
 		v[1].pos.z = 0.5f;
 		v[1].tex.x = 1.0f;
 		v[1].tex.y = 1.0f;
+
 		v[2].pos.x = -1.0f;
 		v[2].pos.y = 1.0f;
 		v[2].pos.z = 0.5f;
 		v[2].tex.x = 0.0f;
 		v[2].tex.y = 0.0f;
+
 		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
