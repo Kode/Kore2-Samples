@@ -1,6 +1,6 @@
-#include <kinc/io/filereader.h>
-#include <kinc/math/matrix.h>
-#include <kinc/system.h>
+#include <kore3/io/filereader.h>
+#include <kore3/math/matrix.h>
+#include <kore3/system.h>
 
 #include <kong.h>
 
@@ -12,28 +12,28 @@
 
 #define USE_BUFFER_IMAGE
 
-static kope_g5_device device;
-static kope_g5_command_list list;
+static kore_gpu_device device;
+static kore_gpu_command_list list;
 static vertex_in_buffer vertices;
-static kope_g5_buffer indices;
-static kope_g5_buffer constants;
-static kope_g5_buffer compute_constants;
+static kore_gpu_buffer indices;
+static kore_gpu_buffer constants;
+static kore_gpu_buffer compute_constants;
 #ifdef USE_BUFFER_IMAGE
-static kope_g5_buffer buffer_texture;
+static kore_gpu_buffer buffer_texture;
 #else
-static kope_g5_texture texture;
-static kope_g5_sampler sampler;
+static kore_gpu_texture texture;
+static kore_gpu_sampler sampler;
 #endif
 static everything_set everything;
 static compute_set compute;
-static kope_g5_buffer image_buffer;
+static kore_gpu_buffer image_buffer;
 
 static const int width = 800;
 static const int height = 600;
 
 void update(void *data) {
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(0);
+	kore_matrix3x3 matrix = kore_matrix3x3_rotation_z(0);
 	constants_data->mvp = matrix;
 	constants_type_buffer_unlock(&constants);
 
@@ -41,16 +41,16 @@ void update(void *data) {
 	compute_constants_data->roll = 0;
 	compute_constants_type_buffer_unlock(&compute_constants);
 
-	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
+	kore_gpu_texture *framebuffer = kore_gpu_device_get_framebuffer(&device);
 
-	kong_set_compute_pipeline(&list, &comp);
+	kong_set_compute_shader_comp(&list);
 	kong_set_descriptor_set_compute(&list, &compute);
-	kope_g5_command_list_compute(&list, 256 / 16, 256 / 16, 1);
+	kore_gpu_command_list_compute(&list, 256 / 16, 256 / 16, 1);
 
-	kope_g5_render_pass_parameters parameters = {0};
+	kore_gpu_render_pass_parameters parameters = {0};
 	parameters.color_attachments_count = 1;
-	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
-	kope_g5_color clear_color;
+	parameters.color_attachments[0].load_op = KORE_GPU_LOAD_OP_CLEAR;
+	kore_gpu_color clear_color;
 	clear_color.r = 0.0f;
 	clear_color.g = 0.0f;
 	clear_color.b = 0.25f;
@@ -59,73 +59,73 @@ void update(void *data) {
 	parameters.color_attachments[0].texture.texture = framebuffer;
 	parameters.color_attachments[0].texture.array_layer_count = 1;
 	parameters.color_attachments[0].texture.mip_level_count = 1;
-	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
-	kope_g5_command_list_begin_render_pass(&list, &parameters);
+	parameters.color_attachments[0].texture.format = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D;
+	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
-	kong_set_render_pipeline(&list, &pipeline);
+	kong_set_render_pipeline_pipeline(&list);
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
-	kope_g5_command_list_set_index_buffer(&list, &indices, KOPE_G5_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
+	kore_gpu_command_list_set_index_buffer(&list, &indices, KORE_GPU_INDEX_FORMAT_UINT16, 0, 3 * sizeof(uint16_t));
 
 	kong_set_descriptor_set_everything(&list, &everything);
 
-	kope_g5_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
+	kore_gpu_command_list_draw_indexed(&list, 3, 1, 0, 0, 0);
 
-	kope_g5_command_list_end_render_pass(&list);
-
-	kope_g5_command_list_present(&list);
-
-	kope_g5_device_execute_command_list(&device, &list);
+	kore_gpu_command_list_end_render_pass(&list);
 
 #ifdef SCREENSHOT
 	screenshot_take(&device, &list, framebuffer, width, height);
 #endif
+
+	kore_gpu_command_list_present(&list);
+
+	kore_gpu_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
-	kinc_init("Compute", width, height, NULL, NULL);
-	kinc_set_update_callback(update, NULL);
+	kore_init("Compute", width, height, NULL, NULL);
+	kore_set_update_callback(update, NULL);
 
-	kope_g5_device_wishlist wishlist = {0};
-	kope_g5_device_create(&device, &wishlist);
+	kore_gpu_device_wishlist wishlist = {0};
+	kore_gpu_device_create(&device, &wishlist);
 
 	kong_init(&device);
 
 #ifdef USE_BUFFER_IMAGE
-	const kope_g5_buffer_parameters buffer_texture_parameters = {
+	const kore_gpu_buffer_parameters buffer_texture_parameters = {
 	    .size = 256 * 256 * 4,
-	    .usage_flags = KOPE_G5_BUFFER_USAGE_READ_WRITE,
+	    .usage_flags = KORE_GPU_BUFFER_USAGE_READ_WRITE,
 	};
-	kope_g5_device_create_buffer(&device, &buffer_texture_parameters, &buffer_texture);
+	kore_gpu_device_create_buffer(&device, &buffer_texture_parameters, &buffer_texture);
 #else
-	kope_g5_texture_parameters texture_parameters;
+	kore_gpu_texture_parameters texture_parameters;
 	texture_parameters.width = 256;
 	texture_parameters.height = 256;
 	texture_parameters.depth_or_array_layers = 1;
 	texture_parameters.mip_level_count = 1;
 	texture_parameters.sample_count = 1;
-	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
+	texture_parameters.dimension = KORE_GPU_TEXTURE_DIMENSION_2D;
+	texture_parameters.format = KORE_GPU_TEXTURE_FORMAT_RGBA32_FLOAT;
 	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_READ_WRITE;
-	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
+	kore_gpu_device_create_texture(&device, &texture_parameters, &texture);
 
-	kope_g5_sampler_parameters sampler_parameters;
-	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
-	sampler_parameters.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
-	sampler_parameters.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;
-	sampler_parameters.mag_filter = KOPE_G5_FILTER_MODE_LINEAR;
-	sampler_parameters.min_filter = KOPE_G5_FILTER_MODE_LINEAR;
-	sampler_parameters.mipmap_filter = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
+	kore_gpu_sampler_parameters sampler_parameters;
+	sampler_parameters.address_mode_u = KORE_GPU_ADDRESS_MODE_REPEAT;
+	sampler_parameters.address_mode_v = KORE_GPU_ADDRESS_MODE_REPEAT;
+	sampler_parameters.address_mode_w = KORE_GPU_ADDRESS_MODE_REPEAT;
+	sampler_parameters.mag_filter = KORE_GPU_FILTER_MODE_LINEAR;
+	sampler_parameters.min_filter = KORE_GPU_FILTER_MODE_LINEAR;
+	sampler_parameters.mipmap_filter = KORE_GPU_MIPMAP_FILTER_MODE_NEAREST;
 	sampler_parameters.lod_min_clamp = 1;
 	sampler_parameters.lod_max_clamp = 32;
-	sampler_parameters.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
+	sampler_parameters.compare = KORE_GPU_COMPARE_FUNCTION_ALWAYS;
 	sampler_parameters.max_anisotropy = 1;
-	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
+	kore_gpu_device_create_sampler(&device, &sampler_parameters, &sampler);
 #endif
 
-	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
+	kore_gpu_device_create_command_list(&device, KORE_GPU_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
@@ -148,16 +148,16 @@ int kickstart(int argc, char **argv) {
 		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
-	kope_g5_buffer_parameters params;
+	kore_gpu_buffer_parameters params;
 	params.size = 3 * sizeof(uint16_t);
-	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
-	kope_g5_device_create_buffer(&device, &params, &indices);
+	params.usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE;
+	kore_gpu_device_create_buffer(&device, &params, &indices);
 	{
-		uint16_t *id = (uint16_t *)kope_g5_buffer_lock_all(&indices);
+		uint16_t *id = (uint16_t *)kore_gpu_buffer_lock_all(&indices);
 		id[0] = 0;
 		id[1] = 1;
 		id[2] = 2;
-		kope_g5_buffer_unlock(&indices);
+		kore_gpu_buffer_unlock(&indices);
 	}
 
 	constants_type_buffer_create(&device, &constants, 1);
@@ -193,7 +193,7 @@ int kickstart(int argc, char **argv) {
 		kong_create_compute_set(&device, &parameters, &compute);
 	}
 
-	kinc_start();
+	kore_start();
 
 	return 0;
 }
