@@ -2,6 +2,8 @@
 #include <kore3/math/matrix.h>
 #include <kore3/system.h>
 
+#include <kong_cpu_comp.h>
+
 #include <kong.h>
 
 #include <assert.h>
@@ -51,15 +53,15 @@ void update(void *data) {
 
 #ifdef USE_CPU
 	kore_float4 *pixel = (kore_float4 *)kore_gpu_buffer_lock_all(&buffer_source_texture);
-	for (uint32_t y = 0; y < 256; ++y) {
-		for (uint32_t x = 0; x < 256; ++x) {
-			pixel[x + y * 256].x = 0.0f;
-			pixel[x + y * 256].y = 0.0f;
-			pixel[x + y * 256].z = 1.0f;
-			pixel[x + y * 256].w = 1.0f;
-		}
-	}
+
+	compute_constants_type compute_data;
+	compute_data.roll = 0;
+	set_compute_constants(&compute_data);
+	set_comp_texture(pixel);
+	comp_on_cpu(256 / 16, 256 / 16, 1);
+
 	kore_gpu_buffer_unlock(&buffer_source_texture);
+
 	kore_gpu_command_list_copy_buffer_to_buffer(&list, &buffer_source_texture, 0, &buffer_texture, 0, buffer_size);
 #else
 	kong_set_compute_shader_comp(&list);
