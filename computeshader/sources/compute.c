@@ -11,6 +11,7 @@
 #endif
 
 #define USE_BUFFER_IMAGE
+#define USE_CPU
 
 static kore_gpu_device device;
 static kore_gpu_command_list list;
@@ -19,6 +20,9 @@ static kore_gpu_buffer indices;
 static kore_gpu_buffer constants;
 static kore_gpu_buffer compute_constants;
 #ifdef USE_BUFFER_IMAGE
+#ifdef USE_CPU
+static kore_gpu_buffer buffer_source_texture;
+#endif
 static kore_gpu_buffer buffer_texture;
 #else
 static kore_gpu_texture texture;
@@ -30,6 +34,8 @@ static kore_gpu_buffer image_buffer;
 
 static const int width = 800;
 static const int height = 600;
+
+static const uint64_t buffer_size = 256 * 256 * sizeof(kore_float4);
 
 void update(void *data) {
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
@@ -43,9 +49,23 @@ void update(void *data) {
 
 	kore_gpu_texture *framebuffer = kore_gpu_device_get_framebuffer(&device);
 
+#ifdef USE_CPU
+	kore_float4 *pixel = (kore_float4 *)kore_gpu_buffer_lock_all(&buffer_source_texture);
+	for (uint32_t y = 0; y < 256; ++y) {
+		for (uint32_t x = 0; x < 256; ++x) {
+			pixel[x + y * 256].x = 0.0f;
+			pixel[x + y * 256].y = 0.0f;
+			pixel[x + y * 256].z = 1.0f;
+			pixel[x + y * 256].w = 1.0f;
+		}
+	}
+	kore_gpu_buffer_unlock(&buffer_source_texture);
+	kore_gpu_command_list_copy_buffer_to_buffer(&list, &buffer_source_texture, 0, &buffer_texture, 0, buffer_size);
+#else
 	kong_set_compute_shader_comp(&list);
 	kong_set_descriptor_set_compute(&list, &compute);
 	kore_gpu_command_list_compute(&list, 256 / 16, 256 / 16, 1);
+#endif
 
 	kore_gpu_render_pass_parameters parameters = {0};
 	parameters.color_attachments_count = 1;
@@ -94,8 +114,15 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 #ifdef USE_BUFFER_IMAGE
+#ifdef USE_CPU
+	const kore_gpu_buffer_parameters buffer_source_texture_parameters = {
+	    .size = buffer_size,
+	    .usage_flags = KORE_GPU_BUFFER_USAGE_CPU_WRITE,
+	};
+	kore_gpu_device_create_buffer(&device, &buffer_source_texture_parameters, &buffer_source_texture);
+#endif
 	const kore_gpu_buffer_parameters buffer_texture_parameters = {
-	    .size = 256 * 256 * sizeof(kore_float4),
+	    .size = buffer_size,
 	    .usage_flags = KORE_GPU_BUFFER_USAGE_READ_WRITE,
 	};
 	kore_gpu_device_create_buffer(&device, &buffer_texture_parameters, &buffer_texture);
