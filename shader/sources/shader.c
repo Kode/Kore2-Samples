@@ -49,7 +49,7 @@ static void update(void *data) {
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
-	kong_set_render_pipeline(&list, &pipeline);
+	kong_set_render_pipeline_pipeline(&list);
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
