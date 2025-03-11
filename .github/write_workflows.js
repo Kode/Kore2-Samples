@@ -27,7 +27,7 @@ const samples = [
   '15_deinterleaved_buffers'
 ];
 
-const workflowsDir = path.join('.github', 'workflows');
+const workflowsDir = path.join('workflows');
 
 function writeWorkflow(workflow) {
   if (workflow.sys === 'FreeBSD') {
