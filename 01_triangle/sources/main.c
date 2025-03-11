@@ -48,7 +48,7 @@ static void update(void *data) {
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
-	kong_set_render_pipeline(&list, &pipeline);
+	kong_set_render_pipeline_pipeline(&list);
 
 	kong_set_vertex_buffer_vertex_in(&list, &vertices);
 
@@ -58,13 +58,13 @@ static void update(void *data) {
 
 	kore_gpu_command_list_end_render_pass(&list);
 
-	kore_gpu_command_list_present(&list);
-
-	kore_gpu_device_execute_command_list(&device, &list);
-
 #ifdef SCREENSHOT
 	screenshot_take(&device, &list, framebuffer, width, height);
 #endif
+
+	kore_gpu_command_list_present(&list);
+
+	kore_gpu_device_execute_command_list(&device, &list);
 }
 
 int kickstart(int argc, char **argv) {
