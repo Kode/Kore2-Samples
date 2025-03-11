@@ -133,7 +133,7 @@ const workflows = [
     runsOn: 'ubuntu-latest',
     steps: '',
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Release && make',
+    compilePostfix: ' && cd build/release && make',
     postfixSteps:
 `    - name: Setup emscripten
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
@@ -147,7 +147,7 @@ const workflows = [
     runsOn: 'ubuntu-latest',
     steps: '',
     compilePrefix: '../emsdk/emsdk activate latest && source ../emsdk/emsdk_env.sh && ',
-    compilePostfix: ' && cd build/Release && make',
+    compilePostfix: ' && cd build/release && make',
     postfixSteps:
 `    - name: Setup emscripten
       run: git clone https://github.com/emscripten-core/emsdk.git && cd emsdk && ./emsdk install latest
