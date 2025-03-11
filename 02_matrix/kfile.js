@@ -1,4 +1,4 @@
-const project = new Project('Matrix');
+const project = new Project('02_matrix');
 
 await project.addProject(findKore());
 

@@ -1,4 +1,4 @@
-const project = new Project('Triangle');
+const project = new Project('01_triangle');
 
 await project.addProject(findKore());
 
