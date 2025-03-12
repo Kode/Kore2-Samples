@@ -1,4 +1,4 @@
-const project = new Project('CameraControls');
+const project = new Project('05_camera_controls');
 
 await project.addProject(findKore());
 

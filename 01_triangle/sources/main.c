@@ -68,7 +68,7 @@ static void update(void *data) {
 }
 
 int kickstart(int argc, char **argv) {
-	kore_init("Example", width, height, NULL, NULL);
+	kore_init("01_triangle", width, height, NULL, NULL);
 	kore_set_update_callback(update, NULL);
 
 	kore_gpu_device_wishlist wishlist = {0};
