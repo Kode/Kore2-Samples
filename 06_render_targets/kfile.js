@@ -1,4 +1,4 @@
-const project = new Project('RenderTargets');
+const project = new Project('06_render_targets');
 
 await project.addProject(findKore());
 

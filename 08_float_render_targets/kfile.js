@@ -1,4 +1,4 @@
-const project = new Project('FloatRenderTargets');
+const project = new Project('08_float_render_targets');
 
 await project.addProject(findKore());
 
