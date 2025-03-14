@@ -24,20 +24,20 @@ static compute_set compute;
 static kope_g5_buffer image_buffer;
 static kope_g5_fence fence;
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
-static uint64_t frame = 0;
+static uint64_t frame   = 0;
 
 void update(void *data) {
 	++frame;
 
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	kinc_matrix3x3_t matrix = kinc_matrix3x3_rotation_z(0);
-	constants_data->mvp = matrix;
+	kinc_matrix3x3_t matrix        = kinc_matrix3x3_rotation_z(0);
+	constants_data->mvp            = matrix;
 	constants_type_buffer_unlock(&constants);
 
 	compute_constants_type *compute_constants_data = compute_constants_type_buffer_lock(&compute_constants, 0, 1);
-	compute_constants_data->roll = 0;
+	compute_constants_data->roll                   = 0;
 	compute_constants_type_buffer_unlock(&compute_constants);
 
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
@@ -47,19 +47,19 @@ void update(void *data) {
 	kope_g5_command_list_compute(&async_list, 256 / 16, 256 / 16, 1);
 
 	kope_g5_render_pass_parameters parameters = {0};
-	parameters.color_attachments_count = 1;
-	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+	parameters.color_attachments_count        = 1;
+	parameters.color_attachments[0].load_op   = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
-	clear_color.r = 0.0f;
-	clear_color.g = 0.0f;
-	clear_color.b = 0.25f;
-	clear_color.a = 1.0f;
-	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture.texture = framebuffer;
+	clear_color.r                                             = 0.0f;
+	clear_color.g                                             = 0.0f;
+	clear_color.b                                             = 0.25f;
+	clear_color.a                                             = 1.0f;
+	parameters.color_attachments[0].clear_value               = clear_color;
+	parameters.color_attachments[0].texture.texture           = framebuffer;
 	parameters.color_attachments[0].texture.array_layer_count = 1;
-	parameters.color_attachments[0].texture.mip_level_count = 1;
-	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+	parameters.color_attachments[0].texture.mip_level_count   = 1;
+	parameters.color_attachments[0].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -97,26 +97,26 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 	kope_g5_texture_parameters texture_parameters;
-	texture_parameters.width = 256;
-	texture_parameters.height = 256;
+	texture_parameters.width                 = 256;
+	texture_parameters.height                = 256;
 	texture_parameters.depth_or_array_layers = 1;
-	texture_parameters.mip_level_count = 1;
-	texture_parameters.sample_count = 1;
-	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
-	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_READ_WRITE;
+	texture_parameters.mip_level_count       = 1;
+	texture_parameters.sample_count          = 1;
+	texture_parameters.dimension             = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_parameters.format                = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
+	texture_parameters.usage                 = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_READ_WRITE;
 	kope_g5_device_create_texture(&device, &texture_parameters, &texture);
 
 	kope_g5_sampler_parameters sampler_parameters;
 	sampler_parameters.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
 	sampler_parameters.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
 	sampler_parameters.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;
-	sampler_parameters.mag_filter = KOPE_G5_FILTER_MODE_LINEAR;
-	sampler_parameters.min_filter = KOPE_G5_FILTER_MODE_LINEAR;
-	sampler_parameters.mipmap_filter = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
-	sampler_parameters.lod_min_clamp = 1;
-	sampler_parameters.lod_max_clamp = 32;
-	sampler_parameters.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
+	sampler_parameters.mag_filter     = KOPE_G5_FILTER_MODE_LINEAR;
+	sampler_parameters.min_filter     = KOPE_G5_FILTER_MODE_LINEAR;
+	sampler_parameters.mipmap_filter  = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
+	sampler_parameters.lod_min_clamp  = 1;
+	sampler_parameters.lod_max_clamp  = 32;
+	sampler_parameters.compare        = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
 	sampler_parameters.max_anisotropy = 1;
 	kope_g5_device_create_sampler(&device, &sampler_parameters, &sampler);
 
@@ -128,57 +128,57 @@ int kickstart(int argc, char **argv) {
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
 	{
 		vertex_in *v = kong_vertex_in_buffer_lock(&vertices);
-		v[0].pos.x = -1.0f;
-		v[0].pos.y = -1.0f;
-		v[0].pos.z = 0.5f;
-		v[0].tex.x = 0.0f;
-		v[0].tex.y = 1.0f;
-		v[1].pos.x = 1.0f;
-		v[1].pos.y = -1.0f;
-		v[1].pos.z = 0.5f;
-		v[1].tex.x = 1.0f;
-		v[1].tex.y = 1.0f;
-		v[2].pos.x = -1.0f;
-		v[2].pos.y = 1.0f;
-		v[2].pos.z = 0.5f;
-		v[2].tex.x = 0.0f;
-		v[2].tex.y = 0.0f;
+		v[0].pos.x   = -1.0f;
+		v[0].pos.y   = -1.0f;
+		v[0].pos.z   = 0.5f;
+		v[0].tex.x   = 0.0f;
+		v[0].tex.y   = 1.0f;
+		v[1].pos.x   = 1.0f;
+		v[1].pos.y   = -1.0f;
+		v[1].pos.z   = 0.5f;
+		v[1].tex.x   = 1.0f;
+		v[1].tex.y   = 1.0f;
+		v[2].pos.x   = -1.0f;
+		v[2].pos.y   = 1.0f;
+		v[2].pos.z   = 0.5f;
+		v[2].tex.x   = 0.0f;
+		v[2].tex.y   = 0.0f;
 		kong_vertex_in_buffer_unlock(&vertices);
 	}
 
 	kope_g5_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *id = (uint16_t *)kope_g5_buffer_lock_all(&indices);
-		id[0] = 0;
-		id[1] = 1;
-		id[2] = 2;
+		id[0]        = 0;
+		id[1]        = 1;
+		id[2]        = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 
 	constants_type_buffer_create(&device, &constants, 1);
 
 	{
-		everything_parameters parameters = {0};
-		parameters.constants = &constants;
-		parameters.comp_texture.texture = &texture;
-		parameters.comp_texture.base_mip_level = 0;
-		parameters.comp_texture.mip_level_count = 1;
+		everything_parameters parameters          = {0};
+		parameters.constants                      = &constants;
+		parameters.comp_texture.texture           = &texture;
+		parameters.comp_texture.base_mip_level    = 0;
+		parameters.comp_texture.mip_level_count   = 1;
 		parameters.comp_texture.array_layer_count = 1;
-		parameters.comp_sampler = &sampler;
+		parameters.comp_sampler                   = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
 
 	compute_constants_type_buffer_create(&device, &compute_constants, 1);
 
 	{
-		compute_parameters parameters = {0};
-		parameters.compute_constants = &compute_constants;
-		parameters.dest_texture.texture = &texture;
-		parameters.dest_texture.base_mip_level = 0;
-		parameters.dest_texture.mip_level_count = 1;
+		compute_parameters parameters             = {0};
+		parameters.compute_constants              = &compute_constants;
+		parameters.dest_texture.texture           = &texture;
+		parameters.dest_texture.base_mip_level    = 0;
+		parameters.dest_texture.mip_level_count   = 1;
 		parameters.dest_texture.array_layer_count = 1;
 		kong_create_compute_set(&device, &parameters, &compute);
 	}

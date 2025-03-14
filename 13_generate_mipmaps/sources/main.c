@@ -21,25 +21,25 @@ static kope_g5_sampler mip_sampler;
 static fs_set set;
 static mip_set mip_sets[4];
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
 
 static void update(void *data) {
 	{
 		kope_g5_render_pass_parameters parameters = {0};
-		parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		parameters.color_attachments[0].load_op   = KOPE_G5_LOAD_OP_CLEAR;
 		kope_g5_color clear_color;
-		clear_color.r = 0.0f;
-		clear_color.g = 0.0f;
-		clear_color.b = 0.0f;
-		clear_color.a = 1.0f;
-		parameters.color_attachments[0].clear_value = clear_color;
-		parameters.color_attachments[0].texture.texture = &render_target;
+		clear_color.r                                             = 0.0f;
+		clear_color.g                                             = 0.0f;
+		clear_color.b                                             = 0.0f;
+		clear_color.a                                             = 1.0f;
+		parameters.color_attachments[0].clear_value               = clear_color;
+		parameters.color_attachments[0].texture.texture           = &render_target;
 		parameters.color_attachments[0].texture.array_layer_count = 1;
-		parameters.color_attachments[0].texture.mip_level_count = 1;
-		parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-		parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
-		parameters.color_attachments_count = 1;
+		parameters.color_attachments[0].texture.mip_level_count   = 1;
+		parameters.color_attachments[0].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+		parameters.color_attachments[0].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+		parameters.color_attachments_count                        = 1;
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 		kong_set_render_pipeline(&list, &pipeline);
@@ -74,19 +74,19 @@ static void update(void *data) {
 
 	{
 		kope_g5_render_pass_parameters parameters = {0};
-		parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		parameters.color_attachments[0].load_op   = KOPE_G5_LOAD_OP_CLEAR;
 		kope_g5_color clear_color;
-		clear_color.r = 0.0f;
-		clear_color.g = 0.0f;
-		clear_color.b = 0.0f;
-		clear_color.a = 1.0f;
-		parameters.color_attachments[0].clear_value = clear_color;
-		parameters.color_attachments[0].texture.texture = framebuffer;
+		clear_color.r                                             = 0.0f;
+		clear_color.g                                             = 0.0f;
+		clear_color.b                                             = 0.0f;
+		clear_color.a                                             = 1.0f;
+		parameters.color_attachments[0].clear_value               = clear_color;
+		parameters.color_attachments[0].texture.texture           = framebuffer;
 		parameters.color_attachments[0].texture.array_layer_count = 1;
-		parameters.color_attachments[0].texture.mip_level_count = 1;
-		parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-		parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
-		parameters.color_attachments_count = 1;
+		parameters.color_attachments[0].texture.mip_level_count   = 1;
+		parameters.color_attachments[0].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+		parameters.color_attachments[0].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+		parameters.color_attachments_count                        = 1;
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 		kong_set_render_pipeline(&list, &fs_pipeline);
@@ -124,20 +124,20 @@ int kickstart(int argc, char **argv) {
 
 	{
 		kope_g5_texture_parameters texture_parameters = {0};
-		texture_parameters.width = 1024;
-		texture_parameters.height = 1024;
-		texture_parameters.depth_or_array_layers = 1;
-		texture_parameters.mip_level_count = 5;
-		texture_parameters.sample_count = 1;
-		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_READ_WRITE;
+		texture_parameters.width                      = 1024;
+		texture_parameters.height                     = 1024;
+		texture_parameters.depth_or_array_layers      = 1;
+		texture_parameters.mip_level_count            = 5;
+		texture_parameters.sample_count               = 1;
+		texture_parameters.dimension                  = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format                     = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage                      = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_READ_WRITE;
 		kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
 	}
 
 	kope_g5_sampler_parameters sampler_params = {0};
-	sampler_params.lod_min_clamp = 0;
-	sampler_params.lod_max_clamp = 5;
+	sampler_params.lod_min_clamp              = 0;
+	sampler_params.lod_max_clamp              = 5;
 	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
@@ -176,53 +176,53 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kope_g5_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 
-	fs_parameters fsparams = {0};
-	fsparams.fs_texture.texture = &render_target;
-	fsparams.fs_texture.base_mip_level = 0;
-	fsparams.fs_texture.mip_level_count = 5;
-	fsparams.fs_texture.base_array_layer = 0;
+	fs_parameters fsparams                = {0};
+	fsparams.fs_texture.texture           = &render_target;
+	fsparams.fs_texture.base_mip_level    = 0;
+	fsparams.fs_texture.mip_level_count   = 5;
+	fsparams.fs_texture.base_array_layer  = 0;
 	fsparams.fs_texture.array_layer_count = 1;
-	fsparams.fs_sampler = &sampler;
+	fsparams.fs_sampler                   = &sampler;
 	kong_create_fs_set(&device, &fsparams, &set);
 
 	kope_g5_sampler_parameters mip_sampler_params = {0};
-	mip_sampler_params.address_mode_u = KOPE_G5_ADDRESS_MODE_REPEAT;
-	mip_sampler_params.address_mode_v = KOPE_G5_ADDRESS_MODE_REPEAT;
-	mip_sampler_params.address_mode_w = KOPE_G5_ADDRESS_MODE_REPEAT;
-	mip_sampler_params.mag_filter = KOPE_G5_FILTER_MODE_LINEAR;
-	mip_sampler_params.min_filter = KOPE_G5_FILTER_MODE_LINEAR;
-	mip_sampler_params.mipmap_filter = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
-	mip_sampler_params.lod_min_clamp = 0;
-	mip_sampler_params.lod_max_clamp = 32;
-	mip_sampler_params.compare = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
-	mip_sampler_params.max_anisotropy = 1;
+	mip_sampler_params.address_mode_u             = KOPE_G5_ADDRESS_MODE_REPEAT;
+	mip_sampler_params.address_mode_v             = KOPE_G5_ADDRESS_MODE_REPEAT;
+	mip_sampler_params.address_mode_w             = KOPE_G5_ADDRESS_MODE_REPEAT;
+	mip_sampler_params.mag_filter                 = KOPE_G5_FILTER_MODE_LINEAR;
+	mip_sampler_params.min_filter                 = KOPE_G5_FILTER_MODE_LINEAR;
+	mip_sampler_params.mipmap_filter              = KOPE_G5_MIPMAP_FILTER_MODE_NEAREST;
+	mip_sampler_params.lod_min_clamp              = 0;
+	mip_sampler_params.lod_max_clamp              = 32;
+	mip_sampler_params.compare                    = KOPE_G5_COMPARE_FUNCTION_ALWAYS;
+	mip_sampler_params.max_anisotropy             = 1;
 	kope_g5_device_create_sampler(&device, &mip_sampler_params, &mip_sampler);
 
 	for (int i = 0; i < 4; ++i) {
-		mip_parameters cparams = {0};
-		cparams.mip_source_texture.texture = &render_target;
-		cparams.mip_source_texture.base_mip_level = i;
-		cparams.mip_source_texture.mip_level_count = 1;
-		cparams.mip_source_texture.base_array_layer = 0;
+		mip_parameters cparams                       = {0};
+		cparams.mip_source_texture.texture           = &render_target;
+		cparams.mip_source_texture.base_mip_level    = i;
+		cparams.mip_source_texture.mip_level_count   = 1;
+		cparams.mip_source_texture.base_array_layer  = 0;
 		cparams.mip_source_texture.array_layer_count = 1;
 
 		cparams.mip_source_sampler = &mip_sampler;
 
-		cparams.mip_destination_texture.texture = &render_target;
-		cparams.mip_destination_texture.base_mip_level = i + 1;
-		cparams.mip_destination_texture.mip_level_count = 1;
-		cparams.mip_destination_texture.base_array_layer = 0;
+		cparams.mip_destination_texture.texture           = &render_target;
+		cparams.mip_destination_texture.base_mip_level    = i + 1;
+		cparams.mip_destination_texture.mip_level_count   = 1;
+		cparams.mip_destination_texture.base_array_layer  = 0;
 		cparams.mip_destination_texture.array_layer_count = 1;
 
 		kong_create_mip_set(&device, &cparams, &mip_sets[i]);

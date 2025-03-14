@@ -26,7 +26,7 @@ static kope_g5_buffer constants;
 static kope_g5_sampler sampler;
 static everything_set everything;
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
 
 /* clang-format off */
@@ -145,8 +145,8 @@ static float vec4_dot(kinc_vector3_t a, kinc_vector3_t b) {
 }
 
 static kinc_matrix4x4_t matrix4x4_perspective_projection(float fovy, float aspect, float zn, float zf) {
-	float uh = 1.0f / tanf(fovy / 2);
-	float uw = uh / aspect;
+	float uh           = 1.0f / tanf(fovy / 2);
+	float uw           = uh / aspect;
 	kinc_matrix4x4_t m = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
 	return m;
 }
@@ -155,22 +155,22 @@ static kinc_matrix4x4_t matrix4x4_look_at(kinc_vector3_t eye, kinc_vector3_t at,
 	kinc_vector3_t zaxis = vec4_normalize(vec4_sub(at, eye));
 	kinc_vector3_t xaxis = vec4_normalize(vec4_cross(zaxis, up));
 	kinc_vector3_t yaxis = vec4_cross(xaxis, zaxis);
-	kinc_matrix4x4_t m = {xaxis.x,
-	                      yaxis.x,
-	                      -zaxis.x,
-	                      0,
-	                      xaxis.y,
-	                      yaxis.y,
-	                      -zaxis.y,
-	                      0,
-	                      xaxis.z,
-	                      yaxis.z,
-	                      -zaxis.z,
-	                      0,
-	                      -vec4_dot(xaxis, eye),
-	                      -vec4_dot(yaxis, eye),
-	                      vec4_dot(zaxis, eye),
-	                      1};
+	kinc_matrix4x4_t m   = {xaxis.x,
+	                        yaxis.x,
+	                        -zaxis.x,
+	                        0,
+	                        xaxis.y,
+	                        yaxis.y,
+	                        -zaxis.y,
+	                        0,
+	                        xaxis.z,
+	                        yaxis.z,
+	                        -zaxis.z,
+	                        0,
+	                        -vec4_dot(xaxis, eye),
+	                        -vec4_dot(yaxis, eye),
+	                        vec4_dot(zaxis, eye),
+	                        1};
 	return m;
 }
 
@@ -189,28 +189,28 @@ static size_t vertex_count = 0;
 
 static void update(void *data) {
 	kinc_matrix4x4_t projection = matrix4x4_perspective_projection(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	kinc_vector3_t v0 = {4, 3, 3};
-	kinc_vector3_t v1 = {0, 0, 0};
-	kinc_vector3_t v2 = {0, 1, 0};
-	kinc_matrix4x4_t view = matrix4x4_look_at(v0, v1, v2);
-	kinc_matrix4x4_t model = matrix4x4_identity();
-	kinc_matrix4x4_t mvp = matrix4x4_identity();
-	mvp = kinc_matrix4x4_multiply(&mvp, &projection);
-	mvp = kinc_matrix4x4_multiply(&mvp, &view);
-	mvp = kinc_matrix4x4_multiply(&mvp, &model);
+	kinc_vector3_t v0           = {4, 3, 3};
+	kinc_vector3_t v1           = {0, 0, 0};
+	kinc_vector3_t v2           = {0, 1, 0};
+	kinc_matrix4x4_t view       = matrix4x4_look_at(v0, v1, v2);
+	kinc_matrix4x4_t model      = matrix4x4_identity();
+	kinc_matrix4x4_t mvp        = matrix4x4_identity();
+	mvp                         = kinc_matrix4x4_multiply(&mvp, &projection);
+	mvp                         = kinc_matrix4x4_multiply(&mvp, &view);
+	mvp                         = kinc_matrix4x4_multiply(&mvp, &model);
 
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	constants_data->mvp = mvp;
+	constants_data->mvp            = mvp;
 	constants_type_buffer_unlock(&constants);
 
 	if (first_update) {
 		kope_g5_image_copy_buffer source = {0};
-		source.buffer = &image_buffer;
-		source.bytes_per_row = 4 * 512;
+		source.buffer                    = &image_buffer;
+		source.bytes_per_row             = 4 * 512;
 
 		kope_g5_image_copy_texture destination = {0};
-		destination.texture = &texture;
-		destination.mip_level = 0;
+		destination.texture                    = &texture;
+		destination.mip_level                  = 0;
 
 		kope_g5_command_list_copy_buffer_to_texture(&list, &source, &destination, 512, 512, 1);
 
@@ -220,19 +220,19 @@ static void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
 	kope_g5_render_pass_parameters parameters = {0};
-	parameters.color_attachments_count = 1;
-	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+	parameters.color_attachments_count        = 1;
+	parameters.color_attachments[0].load_op   = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
-	clear_color.r = 0.0f;
-	clear_color.g = 0.0f;
-	clear_color.b = 0.0f;
-	clear_color.a = 1.0f;
-	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture.texture = framebuffer;
+	clear_color.r                                             = 0.0f;
+	clear_color.g                                             = 0.0f;
+	clear_color.b                                             = 0.0f;
+	clear_color.a                                             = 1.0f;
+	parameters.color_attachments[0].clear_value               = clear_color;
+	parameters.color_attachments[0].texture.texture           = framebuffer;
 	parameters.color_attachments[0].texture.array_layer_count = 1;
-	parameters.color_attachments[0].texture.mip_level_count = 1;
-	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+	parameters.color_attachments[0].texture.mip_level_count   = 1;
+	parameters.color_attachments[0].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -271,7 +271,7 @@ int kickstart(int argc, char **argv) {
 
 	{
 		kope_g5_buffer_parameters buffer_parameters;
-		buffer_parameters.size = kope_g5_device_align_texture_row_bytes(&device, 512 * 4) * 512;
+		buffer_parameters.size        = kope_g5_device_align_texture_row_bytes(&device, 512 * 4) * 512;
 		buffer_parameters.usage_flags = KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 		kope_g5_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
@@ -310,23 +310,23 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kope_g5_texture_parameters texture_params = {0};
-	texture_params.width = 512;
-	texture_params.height = 512;
-	texture_params.depth_or_array_layers = 1;
-	texture_params.mip_level_count = 1;
-	texture_params.sample_count = 1;
-	texture_params.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_params.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-	texture_params.usage = KONG_G5_TEXTURE_USAGE_SAMPLE;
+	texture_params.width                      = 512;
+	texture_params.height                     = 512;
+	texture_params.depth_or_array_layers      = 1;
+	texture_params.mip_level_count            = 1;
+	texture_params.sample_count               = 1;
+	texture_params.dimension                  = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_params.format                     = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	texture_params.usage                      = KONG_G5_TEXTURE_USAGE_SAMPLE;
 	kope_g5_device_create_texture(&device, &texture_params, &texture);
 
 	kope_g5_sampler_parameters sampler_params = {0};
-	sampler_params.lod_min_clamp = 0;
-	sampler_params.lod_max_clamp = 0;
+	sampler_params.lod_min_clamp              = 0;
+	sampler_params.lod_max_clamp              = 0;
 	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
 
 	kope_g5_buffer_parameters params;
-	params.size = vertex_count * sizeof(uint16_t);
+	params.size        = vertex_count * sizeof(uint16_t);
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
@@ -341,13 +341,13 @@ int kickstart(int argc, char **argv) {
 
 	{
 		everything_parameters parameters;
-		parameters.constants = &constants;
-		parameters.tex.texture = &texture;
-		parameters.tex.base_mip_level = 0;
-		parameters.tex.mip_level_count = 1;
-		parameters.tex.base_array_layer = 0;
+		parameters.constants             = &constants;
+		parameters.tex.texture           = &texture;
+		parameters.tex.base_mip_level    = 0;
+		parameters.tex.mip_level_count   = 1;
+		parameters.tex.base_array_layer  = 0;
 		parameters.tex.array_layer_count = 1;
-		parameters.sam = &sampler;
+		parameters.sam                   = &sampler;
 		kong_create_everything_set(&device, &parameters, &everything);
 	}
 

@@ -30,21 +30,21 @@ static kore_gpu_texture depth;
 
 static uint32_t vertex_count;
 
-float last_time = 0.0;
-kore_float3 position = {0, 0, 5};
+float last_time        = 0.0;
+kore_float3 position   = {0, 0, 5};
 float horizontal_angle = 3.14f;
-float vertical_angle = 0.0;
-bool move_forward = false;
-bool move_backward = false;
-bool strafe_left = false;
-bool strafe_right = false;
-bool is_mouse_down = false;
-float mouse_x = 0.0;
-float mouse_y = 0.0;
-float mouse_delta_x = 0.0;
-float mouse_delta_y = 0.0;
+float vertical_angle   = 0.0;
+bool move_forward      = false;
+bool move_backward     = false;
+bool strafe_left       = false;
+bool strafe_right      = false;
+bool is_mouse_down     = false;
+float mouse_x          = 0.0;
+float mouse_y          = 0.0;
+float mouse_delta_x    = 0.0;
+float mouse_delta_y    = 0.0;
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
 
 /* clang-format off */
@@ -163,8 +163,8 @@ float vec3_dot(kore_float3 a, kore_float3 b) {
 }
 
 kore_matrix4x4 matrix4x4_perspective_projection(float fovy, float aspect, float zn, float zf) {
-	float uh = 1.0f / tanf(fovy / 2);
-	float uw = uh / aspect;
+	float uh         = 1.0f / tanf(fovy / 2);
+	float uw         = uh / aspect;
 	kore_matrix4x4 m = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
 	return m;
 }
@@ -173,24 +173,24 @@ kore_matrix4x4 matrix4x4_look_at(kore_float3 eye, kore_float3 at, kore_float3 up
 	kore_float3 zaxis = vec3_normalize(vec3_sub(at, eye));
 	kore_float3 xaxis = vec3_normalize(vec3_cross(zaxis, up));
 	kore_float3 yaxis = vec3_cross(xaxis, zaxis);
-	kore_matrix4x4 m = {
-	    xaxis.x,
-	    yaxis.x,
-	    -zaxis.x,
-	    0,
-	    xaxis.y,
-	    yaxis.y,
-	    -zaxis.y,
-	    0,
-	    xaxis.z,
-	    yaxis.z,
-	    -zaxis.z,
-	    0,
-	    -vec3_dot(xaxis, eye),
-	    -vec3_dot(yaxis, eye),
-	    vec3_dot(zaxis, eye),
-	    1,
-	};
+	kore_matrix4x4 m  = {
+        xaxis.x,
+        yaxis.x,
+        -zaxis.x,
+        0,
+        xaxis.y,
+        yaxis.y,
+        -zaxis.y,
+        0,
+        xaxis.z,
+        yaxis.z,
+        -zaxis.z,
+        0,
+        -vec3_dot(xaxis, eye),
+        -vec3_dot(yaxis, eye),
+        vec3_dot(zaxis, eye),
+        1,
+    };
 	return m;
 }
 
@@ -228,8 +228,8 @@ void key_up(int key, void *data) {
 void mouse_move(int window, int x, int y, int mx, int my, void *data) {
 	mouse_delta_x = x - mouse_x;
 	mouse_delta_y = y - mouse_y;
-	mouse_x = (float)x;
-	mouse_y = (float)y;
+	mouse_x       = (float)x;
+	mouse_y       = (float)y;
 }
 
 void mouse_down(int window, int button, int x, int y, void *data) {
@@ -244,7 +244,7 @@ static bool first_update = true;
 
 static void update(void *data) {
 	float delta_time = (float)kore_time() - last_time;
-	last_time = (float)kore_time();
+	last_time        = (float)kore_time();
 
 	if (is_mouse_down) {
 		horizontal_angle -= 0.005f * mouse_delta_x;
@@ -283,27 +283,27 @@ static void update(void *data) {
 	kore_float3 look = {position.x + direction.x, position.y + direction.y, position.z + direction.z};
 
 	kore_matrix4x4 projection = matrix4x4_perspective_projection(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	kore_float3 v0 = {4, 3, 3};
-	kore_float3 v1 = {0, 0, 0};
-	kore_float3 v2 = {0, 1, 0};
-	kore_matrix4x4 view = matrix4x4_look_at(position, look, up);
-	kore_matrix4x4 model = matrix4x4_identity();
-	kore_matrix4x4 mvp = matrix4x4_identity();
-	mvp = kore_matrix4x4_multiply(&mvp, &projection);
-	mvp = kore_matrix4x4_multiply(&mvp, &view);
-	mvp = kore_matrix4x4_multiply(&mvp, &model);
+	kore_float3 v0            = {4, 3, 3};
+	kore_float3 v1            = {0, 0, 0};
+	kore_float3 v2            = {0, 1, 0};
+	kore_matrix4x4 view       = matrix4x4_look_at(position, look, up);
+	kore_matrix4x4 model      = matrix4x4_identity();
+	kore_matrix4x4 mvp        = matrix4x4_identity();
+	mvp                       = kore_matrix4x4_multiply(&mvp, &projection);
+	mvp                       = kore_matrix4x4_multiply(&mvp, &view);
+	mvp                       = kore_matrix4x4_multiply(&mvp, &model);
 
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	constants_data->mvp = mvp;
+	constants_data->mvp            = mvp;
 	constants_type_buffer_unlock(&constants);
 
 	if (first_update) {
 		kore_gpu_image_copy_buffer source = {0};
-		source.buffer = &image_buffer;
-		source.bytes_per_row = 512 * 4;
+		source.buffer                     = &image_buffer;
+		source.bytes_per_row              = 512 * 4;
 
 		kore_gpu_image_copy_texture destination = {0};
-		destination.texture = &texture;
+		destination.texture                     = &texture;
 
 		kore_gpu_command_list_copy_buffer_to_texture(&list, &source, &destination, 512, 512, 1);
 		first_update = false;
@@ -315,7 +315,7 @@ static void update(void *data) {
 	    .color_attachments_count = 1,
 	    .color_attachments =
 	        {
-	            {
+	                            {
 	                .load_op = KORE_GPU_LOAD_OP_CLEAR,
 	                .clear_value =
 	                    {
@@ -326,20 +326,19 @@ static void update(void *data) {
 	                    },
 	                .texture =
 	                    {
-	                        .texture = framebuffer,
+	                        .texture           = framebuffer,
 	                        .array_layer_count = 1,
-	                        .mip_level_count = 1,
-	                        .format = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
-	                        .dimension = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
+	                        .mip_level_count   = 1,
+	                        .format            = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
+	                        .dimension         = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
 	                    },
-	            },
-	        },
+	            }, },
 	    .depth_stencil_attachment =
 	        {
-	            .texture = &depth,
-	            .depth_load_op = KORE_GPU_LOAD_OP_CLEAR,
-	            .depth_clear_value = 1.0f,
-	        },
+	                            .texture           = &depth,
+	                            .depth_load_op     = KORE_GPU_LOAD_OP_CLEAR,
+	                            .depth_clear_value = 1.0f,
+	                            },
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
@@ -379,7 +378,7 @@ int kickstart(int argc, char **argv) {
 	kong_init(&device);
 
 	kore_gpu_buffer_parameters buffer_parameters;
-	buffer_parameters.size = kore_gpu_device_align_texture_row_bytes(&device, 512 * 4) * 512;
+	buffer_parameters.size        = kore_gpu_device_align_texture_row_bytes(&device, 512 * 4) * 512;
 	buffer_parameters.usage_flags = KORE_GPU_BUFFER_USAGE_CPU_WRITE;
 	kore_gpu_device_create_buffer(&device, &buffer_parameters, &image_buffer);
 
@@ -391,28 +390,28 @@ int kickstart(int argc, char **argv) {
 
 	{
 		kore_gpu_texture_parameters texture_params = {
-		    .format = KORE_GPU_TEXTURE_FORMAT_DEPTH32FLOAT,
-		    .width = width,
-		    .height = height,
+		    .format                = KORE_GPU_TEXTURE_FORMAT_DEPTH32FLOAT,
+		    .width                 = width,
+		    .height                = height,
 		    .depth_or_array_layers = 1,
-		    .dimension = KORE_GPU_TEXTURE_DIMENSION_2D,
-		    .mip_level_count = 1,
-		    .sample_count = 1,
-		    .usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT,
+		    .dimension             = KORE_GPU_TEXTURE_DIMENSION_2D,
+		    .mip_level_count       = 1,
+		    .sample_count          = 1,
+		    .usage                 = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT,
 		};
 		kore_gpu_device_create_texture(&device, &texture_params, &depth);
 	}
 
 	{
 		kore_gpu_texture_parameters texture_parameters = {
-		    .width = 512,
-		    .height = 512,
+		    .width                 = 512,
+		    .height                = 512,
 		    .depth_or_array_layers = 1,
-		    .mip_level_count = 1,
-		    .sample_count = 1,
-		    .dimension = KORE_GPU_TEXTURE_DIMENSION_2D,
-		    .format = KORE_GPU_TEXTURE_FORMAT_RGBA8_UNORM,
-		    .usage = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST,
+		    .mip_level_count       = 1,
+		    .sample_count          = 1,
+		    .dimension             = KORE_GPU_TEXTURE_DIMENSION_2D,
+		    .format                = KORE_GPU_TEXTURE_FORMAT_RGBA8_UNORM,
+		    .usage                 = KONG_G5_TEXTURE_USAGE_SAMPLE | KONG_G5_TEXTURE_USAGE_COPY_DST,
 		};
 		kore_gpu_device_create_texture(&device, &texture_parameters, &texture);
 	}
@@ -421,12 +420,12 @@ int kickstart(int argc, char **argv) {
 	    .address_mode_u = KORE_GPU_ADDRESS_MODE_REPEAT,
 	    .address_mode_v = KORE_GPU_ADDRESS_MODE_REPEAT,
 	    .address_mode_w = KORE_GPU_ADDRESS_MODE_REPEAT,
-	    .mag_filter = KORE_GPU_FILTER_MODE_LINEAR,
-	    .min_filter = KORE_GPU_FILTER_MODE_LINEAR,
-	    .mipmap_filter = KORE_GPU_MIPMAP_FILTER_MODE_NEAREST,
-	    .lod_min_clamp = 1,
-	    .lod_max_clamp = 32,
-	    .compare = KORE_GPU_COMPARE_FUNCTION_ALWAYS,
+	    .mag_filter     = KORE_GPU_FILTER_MODE_LINEAR,
+	    .min_filter     = KORE_GPU_FILTER_MODE_LINEAR,
+	    .mipmap_filter  = KORE_GPU_MIPMAP_FILTER_MODE_NEAREST,
+	    .lod_min_clamp  = 1,
+	    .lod_max_clamp  = 32,
+	    .compare        = KORE_GPU_COMPARE_FUNCTION_ALWAYS,
 	    .max_anisotropy = 1,
 	};
 	kore_gpu_device_create_sampler(&device, &sampler_parameters, &sampler);
@@ -448,7 +447,7 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kore_gpu_buffer_parameters params = {
-	    .size = vertex_count * sizeof(uint16_t),
+	    .size        = vertex_count * sizeof(uint16_t),
 	    .usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE,
 	};
 	kore_gpu_device_create_buffer(&device, &params, &indices);
@@ -467,12 +466,12 @@ int kickstart(int argc, char **argv) {
 		    .constants = &constants,
 		    .pix_texture =
 		        {
-		            .texture = &texture,
-		            .base_mip_level = 0,
-		            .mip_level_count = 1,
-		            .base_array_layer = 0,
-		            .array_layer_count = 1,
-		        },
+		                      .texture           = &texture,
+		                      .base_mip_level    = 0,
+		                      .mip_level_count   = 1,
+		                      .base_array_layer  = 0,
+		                      .array_layer_count = 1,
+		                      },
 		    .pix_sampler = &sampler,
 		};
 		kong_create_everything_set(&device, &parameters, &everything);

@@ -9,18 +9,18 @@ static void screenshot_take(kore_gpu_device *device, kore_gpu_command_list *list
 	uint32_t row_bytes = kore_gpu_device_align_texture_row_bytes(device, width * 4);
 
 	kore_gpu_buffer_parameters buffer_parameters = {
-	    .size = row_bytes * height,
+	    .size        = row_bytes * height,
 	    .usage_flags = KORE_GPU_BUFFER_USAGE_CPU_READ,
 	};
 	kore_gpu_device_create_buffer(device, &buffer_parameters, &screenshot_buffer);
 
 	kore_gpu_image_copy_texture source = {
-	    .texture = framebuffer,
+	    .texture   = framebuffer,
 	    .mip_level = 0,
 	};
 
 	kore_gpu_image_copy_buffer destination = {
-	    .buffer = &screenshot_buffer,
+	    .buffer        = &screenshot_buffer,
 	    .bytes_per_row = row_bytes,
 	};
 

@@ -18,24 +18,24 @@ static kope_g5_texture float_render_target;
 static kope_g5_texture render_target; // intermediate target because D3D12 doesn't seem to like uav framebuffer access
 static compute_set set;
 
-const static int width = 800;
+const static int width  = 800;
 const static int height = 600;
 
 static void update(void *data) {
 	kope_g5_render_pass_parameters parameters = {0};
-	parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+	parameters.color_attachments[0].load_op   = KOPE_G5_LOAD_OP_CLEAR;
 	kope_g5_color clear_color;
-	clear_color.r = 0.0f;
-	clear_color.g = 0.0f;
-	clear_color.b = 0.0f;
-	clear_color.a = 1.0f;
-	parameters.color_attachments[0].clear_value = clear_color;
-	parameters.color_attachments[0].texture.texture = &float_render_target;
+	clear_color.r                                             = 0.0f;
+	clear_color.g                                             = 0.0f;
+	clear_color.b                                             = 0.0f;
+	clear_color.a                                             = 1.0f;
+	parameters.color_attachments[0].clear_value               = clear_color;
+	parameters.color_attachments[0].texture.texture           = &float_render_target;
 	parameters.color_attachments[0].texture.array_layer_count = 1;
-	parameters.color_attachments[0].texture.mip_level_count = 1;
-	parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-	parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
-	parameters.color_attachments_count = 1;
+	parameters.color_attachments[0].texture.mip_level_count   = 1;
+	parameters.color_attachments[0].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+	parameters.color_attachments[0].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+	parameters.color_attachments_count                        = 1;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 	kong_set_render_pipeline(&list, &pipeline);
@@ -62,10 +62,10 @@ static void update(void *data) {
 	kope_g5_command_list_compute(&list, (width + 7) / 8, (height + 7) / 8, 1);
 
 	kope_g5_image_copy_texture source = {0};
-	source.texture = &render_target;
+	source.texture                    = &render_target;
 
 	kope_g5_image_copy_texture destination = {0};
-	destination.texture = framebuffer;
+	destination.texture                    = framebuffer;
 
 	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width, height, 1);
 
@@ -91,27 +91,27 @@ int kickstart(int argc, char **argv) {
 
 	{
 		kope_g5_texture_parameters texture_parameters;
-		texture_parameters.width = width;
-		texture_parameters.height = height;
+		texture_parameters.width                 = width;
+		texture_parameters.height                = height;
 		texture_parameters.depth_or_array_layers = 1;
-		texture_parameters.mip_level_count = 1;
-		texture_parameters.sample_count = 1;
-		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
-		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
+		texture_parameters.mip_level_count       = 1;
+		texture_parameters.sample_count          = 1;
+		texture_parameters.dimension             = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format                = KOPE_G5_TEXTURE_FORMAT_RGBA32_FLOAT;
+		texture_parameters.usage                 = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
 		kope_g5_device_create_texture(&device, &texture_parameters, &float_render_target);
 	}
 
 	{
 		kope_g5_texture_parameters texture_parameters;
-		texture_parameters.width = width;
-		texture_parameters.height = height;
+		texture_parameters.width                 = width;
+		texture_parameters.height                = height;
 		texture_parameters.depth_or_array_layers = 1;
-		texture_parameters.mip_level_count = 1;
-		texture_parameters.sample_count = 1;
-		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_READ_WRITE;
+		texture_parameters.mip_level_count       = 1;
+		texture_parameters.sample_count          = 1;
+		texture_parameters.dimension             = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format                = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage                 = KONG_G5_TEXTURE_USAGE_READ_WRITE;
 		kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
 	}
 
@@ -135,27 +135,27 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kope_g5_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 
-	compute_parameters cparams = {0};
-	cparams.copy_source_texture.texture = &float_render_target;
-	cparams.copy_source_texture.base_mip_level = 0;
-	cparams.copy_source_texture.mip_level_count = 1;
-	cparams.copy_source_texture.base_array_layer = 0;
-	cparams.copy_source_texture.array_layer_count = 1;
-	cparams.copy_destination_texture.texture = &render_target;
-	cparams.copy_destination_texture.base_mip_level = 0;
-	cparams.copy_destination_texture.mip_level_count = 1;
-	cparams.copy_destination_texture.base_array_layer = 0;
+	compute_parameters cparams                         = {0};
+	cparams.copy_source_texture.texture                = &float_render_target;
+	cparams.copy_source_texture.base_mip_level         = 0;
+	cparams.copy_source_texture.mip_level_count        = 1;
+	cparams.copy_source_texture.base_array_layer       = 0;
+	cparams.copy_source_texture.array_layer_count      = 1;
+	cparams.copy_destination_texture.texture           = &render_target;
+	cparams.copy_destination_texture.base_mip_level    = 0;
+	cparams.copy_destination_texture.mip_level_count   = 1;
+	cparams.copy_destination_texture.base_array_layer  = 0;
 	cparams.copy_destination_texture.array_layer_count = 1;
 	kong_create_compute_set(&device, &cparams, &set);
 

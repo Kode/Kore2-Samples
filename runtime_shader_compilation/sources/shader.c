@@ -17,7 +17,7 @@ static kinc_g4_vertex_buffer_t vertices;
 static kinc_g4_index_buffer_t indices;
 
 #define HEAP_SIZE 1024 * 1024
-static uint8_t *heap = NULL;
+static uint8_t *heap   = NULL;
 static size_t heap_top = 0;
 
 static void *allocate(size_t size) {
@@ -44,11 +44,11 @@ static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_
 	kinc_file_reader_t file;
 	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
 	size_t data_size = kinc_file_reader_size(&file);
-	uint8_t *data = allocate(data_size + 1);
+	uint8_t *data    = allocate(data_size + 1);
 	kinc_file_reader_read(&file, data, data_size);
 	kinc_file_reader_close(&file);
 	data[data_size] = 0;
-	int errors = kinc_g4_shader_init_from_source(shader, data, shader_type);
+	int errors      = kinc_g4_shader_init_from_source(shader, data, shader_type);
 	if (errors > 0) {
 		kinc_log(KINC_LOG_LEVEL_ERROR, "Shader-compilation failed.");
 		exit(1);
@@ -69,7 +69,7 @@ int kickstart(int argc, char **argv) {
 	kinc_g4_vertex_structure_init(&structure);
 	kinc_g4_vertex_structure_add(&structure, "pos", KINC_G4_VERTEX_DATA_F32_3X);
 	kinc_g4_pipeline_init(&pipeline);
-	pipeline.vertex_shader = &vertex_shader;
+	pipeline.vertex_shader   = &vertex_shader;
 	pipeline.fragment_shader = &fragment_shader;
 	pipeline.input_layout[0] = &structure;
 	pipeline.input_layout[1] = NULL;
@@ -78,7 +78,7 @@ int kickstart(int argc, char **argv) {
 	kinc_g4_vertex_buffer_init(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
 	{
 		float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
-		int i = 0;
+		int i    = 0;
 
 		v[i++] = -1;
 		v[i++] = -1;
@@ -98,9 +98,9 @@ int kickstart(int argc, char **argv) {
 	kinc_g4_index_buffer_init(&indices, 3, KINC_G4_INDEX_BUFFER_FORMAT_16BIT, KINC_G4_USAGE_STATIC);
 	{
 		uint16_t *i = (uint16_t *)kinc_g4_index_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kinc_g4_index_buffer_unlock_all(&indices);
 	}
 

@@ -15,7 +15,7 @@ static kore_gpu_command_list list;
 static vertex_in_buffer vertices;
 static kore_gpu_buffer indices;
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
 
 static void update(void *data) {
@@ -32,19 +32,18 @@ static void update(void *data) {
 	    .color_attachments_count = 1,
 	    .color_attachments =
 	        {
-	            {
-	                .load_op = KORE_GPU_LOAD_OP_CLEAR,
+	                            {
+	                .load_op     = KORE_GPU_LOAD_OP_CLEAR,
 	                .clear_value = clear_color,
 	                .texture =
 	                    {
-	                        .texture = framebuffer,
+	                        .texture           = framebuffer,
 	                        .array_layer_count = 1,
-	                        .mip_level_count = 1,
-	                        .format = kore_gpu_device_framebuffer_format(&device),
-	                        .dimension = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
+	                        .mip_level_count   = 1,
+	                        .format            = kore_gpu_device_framebuffer_format(&device),
+	                        .dimension         = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
 	                    },
-	            },
-	        },
+	            }, },
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
@@ -96,14 +95,14 @@ int kickstart(int argc, char **argv) {
 	kong_vertex_in_buffer_unlock(&vertices);
 
 	kore_gpu_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE;
 	kore_gpu_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kore_gpu_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kore_gpu_buffer_unlock(&indices);
 	}
 

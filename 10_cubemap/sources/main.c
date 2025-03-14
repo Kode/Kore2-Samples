@@ -19,27 +19,27 @@ static kope_g5_texture render_target;
 static kope_g5_sampler sampler;
 static fs_set set;
 
-static const uint32_t width = 800;
+static const uint32_t width  = 800;
 static const uint32_t height = 600;
 
 static void update(void *data) {
 	{
 		kope_g5_render_pass_parameters parameters = {0};
-		parameters.color_attachments_count = 6;
+		parameters.color_attachments_count        = 6;
 		for (int i = 0; i < 6; ++i) {
 			parameters.color_attachments[i].load_op = KOPE_G5_LOAD_OP_CLEAR;
 			kope_g5_color color;
-			color.r = 0.0f;
-			color.g = 0.0f;
-			color.b = 0.0f;
-			color.a = 1.0f;
-			parameters.color_attachments[i].clear_value = color;
-			parameters.color_attachments[i].texture.texture = &render_target;
+			color.r                                                   = 0.0f;
+			color.g                                                   = 0.0f;
+			color.b                                                   = 0.0f;
+			color.a                                                   = 1.0f;
+			parameters.color_attachments[i].clear_value               = color;
+			parameters.color_attachments[i].texture.texture           = &render_target;
 			parameters.color_attachments[i].texture.array_layer_count = 1;
-			parameters.color_attachments[i].texture.base_array_layer = i;
-			parameters.color_attachments[i].texture.mip_level_count = 1;
-			parameters.color_attachments[i].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-			parameters.color_attachments[i].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+			parameters.color_attachments[i].texture.base_array_layer  = i;
+			parameters.color_attachments[i].texture.mip_level_count   = 1;
+			parameters.color_attachments[i].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+			parameters.color_attachments[i].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 		}
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
@@ -58,19 +58,19 @@ static void update(void *data) {
 
 	{
 		kope_g5_render_pass_parameters parameters = {0};
-		parameters.color_attachments_count = 1;
-		parameters.color_attachments[0].load_op = KOPE_G5_LOAD_OP_CLEAR;
+		parameters.color_attachments_count        = 1;
+		parameters.color_attachments[0].load_op   = KOPE_G5_LOAD_OP_CLEAR;
 		kope_g5_color color;
-		color.r = 0.0f;
-		color.g = 0.0f;
-		color.b = 0.0f;
-		color.a = 1.0f;
-		parameters.color_attachments[0].clear_value = color;
-		parameters.color_attachments[0].texture.texture = framebuffer;
+		color.r                                                   = 0.0f;
+		color.g                                                   = 0.0f;
+		color.b                                                   = 0.0f;
+		color.a                                                   = 1.0f;
+		parameters.color_attachments[0].clear_value               = color;
+		parameters.color_attachments[0].texture.texture           = framebuffer;
 		parameters.color_attachments[0].texture.array_layer_count = 1;
-		parameters.color_attachments[0].texture.mip_level_count = 1;
-		parameters.color_attachments[0].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-		parameters.color_attachments[0].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+		parameters.color_attachments[0].texture.mip_level_count   = 1;
+		parameters.color_attachments[0].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+		parameters.color_attachments[0].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 		kope_g5_command_list_begin_render_pass(&list, &parameters);
 
 		kong_set_render_pipeline(&list, &fs_pipeline);
@@ -107,14 +107,14 @@ int kickstart(int argc, char **argv) {
 	kope_g5_device_create_command_list(&device, KOPE_G5_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kope_g5_texture_parameters texture_parameters;
-	texture_parameters.width = 512;
-	texture_parameters.height = 512;
+	texture_parameters.width                 = 512;
+	texture_parameters.height                = 512;
 	texture_parameters.depth_or_array_layers = 6;
-	texture_parameters.mip_level_count = 1;
-	texture_parameters.sample_count = 1;
-	texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-	texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-	texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
+	texture_parameters.mip_level_count       = 1;
+	texture_parameters.sample_count          = 1;
+	texture_parameters.dimension             = KOPE_G5_TEXTURE_DIMENSION_2D;
+	texture_parameters.format                = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+	texture_parameters.usage                 = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT;
 	kope_g5_device_create_texture(&device, &texture_parameters, &render_target);
 
 	kong_create_buffer_vertex_in(&device, 3, &vertices);
@@ -137,14 +137,14 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kope_g5_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 
@@ -167,13 +167,13 @@ int kickstart(int argc, char **argv) {
 	kope_g5_sampler_parameters sampler_params = {0};
 	kope_g5_device_create_sampler(&device, &sampler_params, &sampler);
 
-	fs_parameters fs_params = {0};
-	fs_params.fs_texture.texture = &render_target;
-	fs_params.fs_texture.base_mip_level = 0;
-	fs_params.fs_texture.mip_level_count = 1;
-	fs_params.fs_texture.base_array_layer = 0;
+	fs_parameters fs_params                = {0};
+	fs_params.fs_texture.texture           = &render_target;
+	fs_params.fs_texture.base_mip_level    = 0;
+	fs_params.fs_texture.mip_level_count   = 1;
+	fs_params.fs_texture.base_array_layer  = 0;
 	fs_params.fs_texture.array_layer_count = 6;
-	fs_params.fs_sampler = &sampler;
+	fs_params.fs_sampler                   = &sampler;
 	kong_create_fs_set(&device, &fs_params, &set);
 
 	kinc_start();

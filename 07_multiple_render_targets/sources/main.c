@@ -23,7 +23,7 @@ static vertex_in_buffer vertices;
 static kope_g5_buffer indices;
 static kope_g5_texture render_targets[4];
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
 
 static void update(void *data) {
@@ -31,16 +31,16 @@ static void update(void *data) {
 	for (uint32_t i = 0; i < 4; ++i) {
 		parameters.color_attachments[i].load_op = KOPE_G5_LOAD_OP_CLEAR;
 		kope_g5_color clear_color;
-		clear_color.r = 0.0f;
-		clear_color.g = 0.0f;
-		clear_color.b = 0.0f;
-		clear_color.a = 1.0f;
-		parameters.color_attachments[i].clear_value = clear_color;
-		parameters.color_attachments[i].texture.texture = &render_targets[i];
+		clear_color.r                                             = 0.0f;
+		clear_color.g                                             = 0.0f;
+		clear_color.b                                             = 0.0f;
+		clear_color.a                                             = 1.0f;
+		parameters.color_attachments[i].clear_value               = clear_color;
+		parameters.color_attachments[i].texture.texture           = &render_targets[i];
 		parameters.color_attachments[i].texture.array_layer_count = 1;
-		parameters.color_attachments[i].texture.mip_level_count = 1;
-		parameters.color_attachments[i].texture.format = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
-		parameters.color_attachments[i].texture.dimension = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
+		parameters.color_attachments[i].texture.mip_level_count   = 1;
+		parameters.color_attachments[i].texture.format            = KOPE_G5_TEXTURE_FORMAT_BGRA8_UNORM;
+		parameters.color_attachments[i].texture.dimension         = KOPE_G5_TEXTURE_VIEW_DIMENSION_2D;
 	}
 	parameters.color_attachments_count = 4;
 	kope_g5_command_list_begin_render_pass(&list, &parameters);
@@ -58,38 +58,38 @@ static void update(void *data) {
 	kope_g5_texture *framebuffer = kope_g5_device_get_framebuffer(&device);
 
 	kope_g5_image_copy_texture destination = {0};
-	destination.texture = framebuffer;
-	destination.aspect = KOPE_G5_IMAGE_COPY_ASPECT_ALL;
-	destination.mip_level = 0;
-	destination.origin_x = 0;
-	destination.origin_y = 0;
-	destination.origin_z = 0;
+	destination.texture                    = framebuffer;
+	destination.aspect                     = KOPE_G5_IMAGE_COPY_ASPECT_ALL;
+	destination.mip_level                  = 0;
+	destination.origin_x                   = 0;
+	destination.origin_y                   = 0;
+	destination.origin_z                   = 0;
 
 	kope_g5_image_copy_texture source = {0};
-	source.texture = &render_targets[0];
-	source.aspect = KOPE_G5_IMAGE_COPY_ASPECT_ALL;
-	source.mip_level = 0;
-	source.origin_x = 0;
-	source.origin_y = 0;
-	source.origin_z = 0;
+	source.texture                    = &render_targets[0];
+	source.aspect                     = KOPE_G5_IMAGE_COPY_ASPECT_ALL;
+	source.mip_level                  = 0;
+	source.origin_x                   = 0;
+	source.origin_y                   = 0;
+	source.origin_z                   = 0;
 
 	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
 	destination.origin_x = width / 2;
 	destination.origin_y = 0;
-	source.texture = &render_targets[1];
+	source.texture       = &render_targets[1];
 
 	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
 	destination.origin_x = 0;
 	destination.origin_y = height / 2;
-	source.texture = &render_targets[2];
+	source.texture       = &render_targets[2];
 
 	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
 	destination.origin_x = width / 2;
 	destination.origin_y = height / 2;
-	source.texture = &render_targets[3];
+	source.texture       = &render_targets[3];
 
 	kope_g5_command_list_copy_texture_to_texture(&list, &source, &destination, width / 2, height / 2, 1);
 
@@ -115,14 +115,14 @@ int kickstart(int argc, char **argv) {
 
 	for (uint32_t i = 0; i < 4; ++i) {
 		kope_g5_texture_parameters texture_parameters;
-		texture_parameters.width = width / 2;
-		texture_parameters.height = height / 2;
+		texture_parameters.width                 = width / 2;
+		texture_parameters.height                = height / 2;
 		texture_parameters.depth_or_array_layers = 1;
-		texture_parameters.mip_level_count = 1;
-		texture_parameters.sample_count = 1;
-		texture_parameters.dimension = KOPE_G5_TEXTURE_DIMENSION_2D;
-		texture_parameters.format = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
-		texture_parameters.usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_COPY_SRC;
+		texture_parameters.mip_level_count       = 1;
+		texture_parameters.sample_count          = 1;
+		texture_parameters.dimension             = KOPE_G5_TEXTURE_DIMENSION_2D;
+		texture_parameters.format                = KOPE_G5_TEXTURE_FORMAT_RGBA8_UNORM;
+		texture_parameters.usage                 = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_COPY_SRC;
 		kope_g5_device_create_texture(&device, &texture_parameters, &render_targets[i]);
 	}
 
@@ -146,14 +146,14 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kope_g5_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KOPE_G5_BUFFER_USAGE_INDEX | KOPE_G5_BUFFER_USAGE_CPU_WRITE;
 	kope_g5_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kope_g5_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kope_g5_buffer_unlock(&indices);
 	}
 

@@ -24,7 +24,7 @@ static kore_gpu_texture depth;
 
 static uint32_t vertex_count;
 
-static const int width = 800;
+static const int width  = 800;
 static const int height = 600;
 
 /* clang-format off */
@@ -143,8 +143,8 @@ float vec3_dot(kore_float3 a, kore_float3 b) {
 }
 
 kore_matrix4x4 matrix4x4_perspective_projection(float fovy, float aspect, float zn, float zf) {
-	float uh = 1.0f / tanf(fovy / 2);
-	float uw = uh / aspect;
+	float uh         = 1.0f / tanf(fovy / 2);
+	float uw         = uh / aspect;
 	kore_matrix4x4 m = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
 	return m;
 }
@@ -153,22 +153,22 @@ kore_matrix4x4 matrix4x4_look_at(kore_float3 eye, kore_float3 at, kore_float3 up
 	kore_float3 zaxis = vec3_normalize(vec3_sub(at, eye));
 	kore_float3 xaxis = vec3_normalize(vec3_cross(zaxis, up));
 	kore_float3 yaxis = vec3_cross(xaxis, zaxis);
-	kore_matrix4x4 m = {xaxis.x,
-	                    yaxis.x,
-	                    -zaxis.x,
-	                    0,
-	                    xaxis.y,
-	                    yaxis.y,
-	                    -zaxis.y,
-	                    0,
-	                    xaxis.z,
-	                    yaxis.z,
-	                    -zaxis.z,
-	                    0,
-	                    -vec3_dot(xaxis, eye),
-	                    -vec3_dot(yaxis, eye),
-	                    vec3_dot(zaxis, eye),
-	                    1};
+	kore_matrix4x4 m  = {xaxis.x,
+	                     yaxis.x,
+	                     -zaxis.x,
+	                     0,
+	                     xaxis.y,
+	                     yaxis.y,
+	                     -zaxis.y,
+	                     0,
+	                     xaxis.z,
+	                     yaxis.z,
+	                     -zaxis.z,
+	                     0,
+	                     -vec3_dot(xaxis, eye),
+	                     -vec3_dot(yaxis, eye),
+	                     vec3_dot(zaxis, eye),
+	                     1};
 	return m;
 }
 
@@ -183,18 +183,18 @@ kore_matrix4x4 matrix4x4_identity(void) {
 
 static void update(void *data) {
 	kore_matrix4x4 projection = matrix4x4_perspective_projection(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	kore_float3 v0 = {4, 3, 3};
-	kore_float3 v1 = {0, 0, 0};
-	kore_float3 v2 = {0, 1, 0};
-	kore_matrix4x4 view = matrix4x4_look_at(v0, v1, v2);
-	kore_matrix4x4 model = matrix4x4_identity();
-	kore_matrix4x4 mvp = matrix4x4_identity();
-	mvp = kore_matrix4x4_multiply(&mvp, &projection);
-	mvp = kore_matrix4x4_multiply(&mvp, &view);
-	mvp = kore_matrix4x4_multiply(&mvp, &model);
+	kore_float3 v0            = {4, 3, 3};
+	kore_float3 v1            = {0, 0, 0};
+	kore_float3 v2            = {0, 1, 0};
+	kore_matrix4x4 view       = matrix4x4_look_at(v0, v1, v2);
+	kore_matrix4x4 model      = matrix4x4_identity();
+	kore_matrix4x4 mvp        = matrix4x4_identity();
+	mvp                       = kore_matrix4x4_multiply(&mvp, &projection);
+	mvp                       = kore_matrix4x4_multiply(&mvp, &view);
+	mvp                       = kore_matrix4x4_multiply(&mvp, &model);
 
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	constants_data->mvp = mvp;
+	constants_data->mvp            = mvp;
 	constants_type_buffer_unlock(&constants);
 
 	kore_gpu_texture *framebuffer = kore_gpu_device_get_framebuffer(&device);
@@ -203,7 +203,7 @@ static void update(void *data) {
 	    .color_attachments_count = 1,
 	    .color_attachments =
 	        {
-	            {
+	                            {
 	                .load_op = KORE_GPU_LOAD_OP_CLEAR,
 	                .clear_value =
 	                    {
@@ -214,20 +214,19 @@ static void update(void *data) {
 	                    },
 	                .texture =
 	                    {
-	                        .texture = framebuffer,
+	                        .texture           = framebuffer,
 	                        .array_layer_count = 1,
-	                        .mip_level_count = 1,
-	                        .format = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
-	                        .dimension = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
+	                        .mip_level_count   = 1,
+	                        .format            = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
+	                        .dimension         = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
 	                    },
-	            },
-	        },
+	            }, },
 	    .depth_stencil_attachment =
 	        {
-	            .texture = &depth,
-	            .depth_clear_value = 1.0f,
-	            .depth_load_op = KORE_GPU_LOAD_OP_CLEAR,
-	        },
+	                            .texture           = &depth,
+	                            .depth_clear_value = 1.0f,
+	                            .depth_load_op     = KORE_GPU_LOAD_OP_CLEAR,
+	                            },
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
@@ -264,14 +263,14 @@ int kickstart(int argc, char **argv) {
 	kore_gpu_device_create_command_list(&device, KORE_GPU_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kore_gpu_texture_parameters texture_params = {
-	    .format = KORE_GPU_TEXTURE_FORMAT_DEPTH32FLOAT,
-	    .width = width,
-	    .height = height,
+	    .format                = KORE_GPU_TEXTURE_FORMAT_DEPTH32FLOAT,
+	    .width                 = width,
+	    .height                = height,
 	    .depth_or_array_layers = 1,
-	    .dimension = KORE_GPU_TEXTURE_DIMENSION_2D,
-	    .mip_level_count = 1,
-	    .sample_count = 1,
-	    .usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT,
+	    .dimension             = KORE_GPU_TEXTURE_DIMENSION_2D,
+	    .mip_level_count       = 1,
+	    .sample_count          = 1,
+	    .usage                 = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT,
 	};
 	kore_gpu_device_create_texture(&device, &texture_params, &depth);
 
@@ -292,7 +291,7 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kore_gpu_buffer_parameters params = {
-	    .size = vertex_count * sizeof(uint16_t),
+	    .size        = vertex_count * sizeof(uint16_t),
 	    .usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE,
 	};
 	kore_gpu_device_create_buffer(&device, &params, &indices);

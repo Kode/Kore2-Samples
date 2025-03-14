@@ -16,7 +16,7 @@ static vertex_in_buffer vertices;
 static kore_gpu_buffer indices;
 static kore_gpu_texture render_target;
 
-static const uint32_t width = 800;
+static const uint32_t width  = 800;
 static const uint32_t height = 600;
 
 static void update(void *data) {
@@ -24,7 +24,7 @@ static void update(void *data) {
 	    .color_attachments_count = 1,
 	    .color_attachments =
 	        {
-	            {
+	                            {
 	                .load_op = KORE_GPU_LOAD_OP_CLEAR,
 	                .clear_value =
 	                    {
@@ -35,14 +35,13 @@ static void update(void *data) {
 	                    },
 	                .texture =
 	                    {
-	                        .texture = &render_target,
+	                        .texture           = &render_target,
 	                        .array_layer_count = 1,
-	                        .mip_level_count = 1,
-	                        .format = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
-	                        .dimension = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
+	                        .mip_level_count   = 1,
+	                        .format            = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
+	                        .dimension         = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
 	                    },
-	            },
-	        },
+	            }, },
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
@@ -89,14 +88,14 @@ int kickstart(int argc, char **argv) {
 	kore_gpu_device_create_command_list(&device, KORE_GPU_COMMAND_LIST_TYPE_GRAPHICS, &list);
 
 	kore_gpu_texture_parameters texture_parameters = {
-	    .width = width,
-	    .height = height,
+	    .width                 = width,
+	    .height                = height,
 	    .depth_or_array_layers = 1,
-	    .mip_level_count = 1,
-	    .sample_count = 1,
-	    .dimension = KORE_GPU_TEXTURE_DIMENSION_2D,
-	    .format = KORE_GPU_TEXTURE_FORMAT_RGBA8_UNORM,
-	    .usage = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_COPY_SRC,
+	    .mip_level_count       = 1,
+	    .sample_count          = 1,
+	    .dimension             = KORE_GPU_TEXTURE_DIMENSION_2D,
+	    .format                = KORE_GPU_TEXTURE_FORMAT_RGBA8_UNORM,
+	    .usage                 = KONG_G5_TEXTURE_USAGE_RENDER_ATTACHMENT | KONG_G5_TEXTURE_USAGE_COPY_SRC,
 	};
 	kore_gpu_device_create_texture(&device, &texture_parameters, &render_target);
 
@@ -120,14 +119,14 @@ int kickstart(int argc, char **argv) {
 	}
 
 	kore_gpu_buffer_parameters params;
-	params.size = 3 * sizeof(uint16_t);
+	params.size        = 3 * sizeof(uint16_t);
 	params.usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE;
 	kore_gpu_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kore_gpu_buffer_lock_all(&indices);
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		i[0]        = 0;
+		i[1]        = 1;
+		i[2]        = 2;
 		kore_gpu_buffer_unlock(&indices);
 	}
 
