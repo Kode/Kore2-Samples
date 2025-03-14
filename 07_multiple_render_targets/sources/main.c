@@ -17,11 +17,11 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static vertex_in_buffer vertices;
-static kope_g5_buffer indices;
-static kope_g5_texture render_targets[4];
+static vertex_in_buffer     vertices;
+static kope_g5_buffer       indices;
+static kope_g5_texture      render_targets[4];
 
 static const int width  = 800;
 static const int height = 600;

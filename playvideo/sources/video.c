@@ -12,18 +12,18 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_shader_t vertexShader;
-static kinc_g4_shader_t fragmentShader;
-static kinc_g4_pipeline_t pipeline;
-static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
-static kinc_video_t video;
-static kinc_g4_texture_unit_t texunit;
+static kinc_g4_shader_t            vertexShader;
+static kinc_g4_shader_t            fragmentShader;
+static kinc_g4_pipeline_t          pipeline;
+static kinc_g4_vertex_buffer_t     vertices;
+static kinc_g4_index_buffer_t      indices;
+static kinc_video_t                video;
+static kinc_g4_texture_unit_t      texunit;
 static kinc_g4_constant_location_t offset;
 
 #define HEAP_SIZE 1024 * 1024
-static uint8_t *heap   = NULL;
-static size_t heap_top = 0;
+static uint8_t *heap     = NULL;
+static size_t   heap_top = 0;
 
 static void *allocate(size_t size) {
 	size_t old_top = heap_top;
@@ -60,7 +60,7 @@ int kickstart(int argc, char **argv) {
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "video.vert", KINC_FILE_TYPE_ASSET);
-		size_t size   = kinc_file_reader_size(&reader);
+		size_t   size = kinc_file_reader_size(&reader);
 		uint8_t *data = allocate(size);
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);
@@ -71,7 +71,7 @@ int kickstart(int argc, char **argv) {
 	{
 		kinc_file_reader_t reader;
 		kinc_file_reader_open(&reader, "video.frag", KINC_FILE_TYPE_ASSET);
-		size_t size   = kinc_file_reader_size(&reader);
+		size_t   size = kinc_file_reader_size(&reader);
 		uint8_t *data = allocate(size);
 		kinc_file_reader_read(&reader, data, size);
 		kinc_file_reader_close(&reader);

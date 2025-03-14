@@ -13,16 +13,16 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static vertex_in_buffer vertices;
-static kope_g5_buffer indices;
-static kope_g5_buffer image_buffer;
-static kope_g5_buffer image_buffer2;
-static kope_g5_texture texture;
-static kope_g5_sampler sampler;
-static kope_g5_buffer constants;
-static everything_set everything;
+static vertex_in_buffer     vertices;
+static kope_g5_buffer       indices;
+static kope_g5_buffer       image_buffer;
+static kope_g5_buffer       image_buffer2;
+static kope_g5_texture      texture;
+static kope_g5_sampler      sampler;
+static kope_g5_buffer       constants;
+static everything_set       everything;
 
 static const int width  = 800;
 static const int height = 600;
@@ -137,7 +137,7 @@ int kickstart(int argc, char **argv) {
 		kinc_image_init_from_file(&image, image_data, "parrot.png");
 		kinc_image_destroy(&image);
 
-		uint32_t stride          = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
+		uint32_t  stride         = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
 		uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock_all(&image_buffer);
 		for (int y = 0; y < 250; ++y) {
 			for (int x = 0; x < 250; ++x) {
@@ -161,7 +161,7 @@ int kickstart(int argc, char **argv) {
 		kinc_image_init_from_file(&image, image_data, "parrot2.png");
 		kinc_image_destroy(&image);
 
-		uint32_t stride          = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
+		uint32_t  stride         = kope_g5_device_align_texture_row_bytes(&device, 250 * 4) / 4;
 		uint32_t *gpu_image_data = (uint32_t *)kope_g5_buffer_lock_all(&image_buffer2);
 		for (int y = 0; y < 250; ++y) {
 			for (int x = 0; x < 250; ++x) {

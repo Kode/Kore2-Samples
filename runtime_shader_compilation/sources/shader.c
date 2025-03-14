@@ -10,15 +10,15 @@
 #include <assert.h>
 #include <stdlib.h>
 
-static kinc_g4_shader_t vertex_shader;
-static kinc_g4_shader_t fragment_shader;
-static kinc_g4_pipeline_t pipeline;
+static kinc_g4_shader_t        vertex_shader;
+static kinc_g4_shader_t        fragment_shader;
+static kinc_g4_pipeline_t      pipeline;
 static kinc_g4_vertex_buffer_t vertices;
-static kinc_g4_index_buffer_t indices;
+static kinc_g4_index_buffer_t  indices;
 
 #define HEAP_SIZE 1024 * 1024
-static uint8_t *heap   = NULL;
-static size_t heap_top = 0;
+static uint8_t *heap     = NULL;
+static size_t   heap_top = 0;
 
 static void *allocate(size_t size) {
 	size_t old_top = heap_top;
@@ -43,8 +43,8 @@ static void update(void *data) {
 static void load_shader(const char *filename, kinc_g4_shader_t *shader, kinc_g4_shader_type_t shader_type) {
 	kinc_file_reader_t file;
 	kinc_file_reader_open(&file, filename, KINC_FILE_TYPE_ASSET);
-	size_t data_size = kinc_file_reader_size(&file);
-	uint8_t *data    = allocate(data_size + 1);
+	size_t   data_size = kinc_file_reader_size(&file);
+	uint8_t *data      = allocate(data_size + 1);
 	kinc_file_reader_read(&file, data, data_size);
 	kinc_file_reader_close(&file);
 	data[data_size] = 0;
@@ -78,7 +78,7 @@ int kickstart(int argc, char **argv) {
 	kinc_g4_vertex_buffer_init(&vertices, 3, &structure, KINC_G4_USAGE_STATIC, 0);
 	{
 		float *v = kinc_g4_vertex_buffer_lock_all(&vertices);
-		int i    = 0;
+		int    i = 0;
 
 		v[i++] = -1;
 		v[i++] = -1;

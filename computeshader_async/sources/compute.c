@@ -10,30 +10,30 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
 static kope_g5_command_list async_list;
-static vertex_in_buffer vertices;
-static kope_g5_buffer indices;
-static kope_g5_buffer constants;
-static kope_g5_buffer compute_constants;
-static kope_g5_texture texture;
-static kope_g5_sampler sampler;
-static everything_set everything;
-static compute_set compute;
-static kope_g5_buffer image_buffer;
-static kope_g5_fence fence;
+static vertex_in_buffer     vertices;
+static kope_g5_buffer       indices;
+static kope_g5_buffer       constants;
+static kope_g5_buffer       compute_constants;
+static kope_g5_texture      texture;
+static kope_g5_sampler      sampler;
+static everything_set       everything;
+static compute_set          compute;
+static kope_g5_buffer       image_buffer;
+static kope_g5_fence        fence;
 
 static const int width  = 800;
 static const int height = 600;
-static uint64_t frame   = 0;
+static uint64_t  frame  = 0;
 
 void update(void *data) {
 	++frame;
 
-	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	kinc_matrix3x3_t matrix        = kinc_matrix3x3_rotation_z(0);
-	constants_data->mvp            = matrix;
+	constants_type  *constants_data = constants_type_buffer_lock(&constants, 0, 1);
+	kinc_matrix3x3_t matrix         = kinc_matrix3x3_rotation_z(0);
+	constants_data->mvp             = matrix;
 	constants_type_buffer_unlock(&constants);
 
 	compute_constants_type *compute_constants_data = compute_constants_type_buffer_lock(&compute_constants, 0, 1);

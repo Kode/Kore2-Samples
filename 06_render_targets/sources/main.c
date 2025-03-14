@@ -10,11 +10,11 @@
 #include "../../screenshot.h"
 #endif
 
-static kore_gpu_device device;
+static kore_gpu_device       device;
 static kore_gpu_command_list list;
-static vertex_in_buffer vertices;
-static kore_gpu_buffer indices;
-static kore_gpu_texture render_target;
+static vertex_in_buffer      vertices;
+static kore_gpu_buffer       indices;
+static kore_gpu_texture      render_target;
 
 static const uint32_t width  = 800;
 static const uint32_t height = 600;

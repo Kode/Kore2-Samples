@@ -10,7 +10,7 @@
 #include "../../screenshot.h"
 #endif
 
-static kore_gpu_device device;
+static kore_gpu_device       device;
 static kore_gpu_command_list list;
 
 static const int width  = 800;

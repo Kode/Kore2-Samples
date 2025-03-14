@@ -13,20 +13,20 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static vertex_in_buffer vertices;
-static kope_g5_buffer indices;
-static kope_g5_buffer image_buffer;
-static kope_g5_texture texture;
-static kope_g5_sampler sampler;
-static kope_g5_buffer constants;
-static everything_set everything;
+static vertex_in_buffer     vertices;
+static kope_g5_buffer       indices;
+static kope_g5_buffer       image_buffer;
+static kope_g5_texture      texture;
+static kope_g5_sampler      sampler;
+static kope_g5_buffer       constants;
+static everything_set       everything;
 
 static const int width  = 800;
 static const int height = 600;
 
-static bool first_update     = true;
+static bool     first_update = true;
 static uint64_t update_index = 0;
 
 static float time(void) {

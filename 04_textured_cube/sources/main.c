@@ -15,16 +15,16 @@
 #include "../../screenshot.h"
 #endif
 
-static kore_gpu_device device;
+static kore_gpu_device       device;
 static kore_gpu_command_list list;
-static vertex_in_buffer vertices;
-static kore_gpu_buffer indices;
-static kore_gpu_buffer constants;
-static kore_gpu_texture texture;
-static kore_gpu_sampler sampler;
-static everything_set everything;
-static kore_gpu_buffer image_buffer;
-static kore_gpu_texture depth;
+static vertex_in_buffer      vertices;
+static kore_gpu_buffer       indices;
+static kore_gpu_buffer       constants;
+static kore_gpu_texture      texture;
+static kore_gpu_sampler      sampler;
+static everything_set        everything;
+static kore_gpu_buffer       image_buffer;
+static kore_gpu_texture      depth;
 
 static uint32_t vertex_count;
 
@@ -147,17 +147,17 @@ float vec3_dot(kore_float3 a, kore_float3 b) {
 }
 
 kore_matrix4x4 matrix4x4_perspective_projection(float fovy, float aspect, float zn, float zf) {
-	float uh         = 1.0f / tanf(fovy / 2);
-	float uw         = uh / aspect;
-	kore_matrix4x4 m = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
+	float          uh = 1.0f / tanf(fovy / 2);
+	float          uw = uh / aspect;
+	kore_matrix4x4 m  = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
 	return m;
 }
 
 kore_matrix4x4 matrix4x4_look_at(kore_float3 eye, kore_float3 at, kore_float3 up) {
-	kore_float3 zaxis = vec3_normalize(vec3_sub(at, eye));
-	kore_float3 xaxis = vec3_normalize(vec3_cross(zaxis, up));
-	kore_float3 yaxis = vec3_cross(xaxis, zaxis);
-	kore_matrix4x4 m  = {
+	kore_float3    zaxis = vec3_normalize(vec3_sub(at, eye));
+	kore_float3    xaxis = vec3_normalize(vec3_cross(zaxis, up));
+	kore_float3    yaxis = vec3_cross(xaxis, zaxis);
+	kore_matrix4x4 m     = {
         xaxis.x,
         yaxis.x,
         -zaxis.x,
@@ -191,9 +191,9 @@ static bool first_update = true;
 
 static void update(void *data) {
 	kore_matrix4x4 projection = matrix4x4_perspective_projection(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	kore_float3 v0            = {4, 3, 3};
-	kore_float3 v1            = {0, 0, 0};
-	kore_float3 v2            = {0, 1, 0};
+	kore_float3    v0         = {4, 3, 3};
+	kore_float3    v1         = {0, 0, 0};
+	kore_float3    v2         = {0, 1, 0};
 	kore_matrix4x4 view       = matrix4x4_look_at(v0, v1, v2);
 	kore_matrix4x4 model      = matrix4x4_identity();
 	kore_matrix4x4 mvp        = matrix4x4_identity();

@@ -10,13 +10,13 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static vertex_in_buffer vertices;
-static kope_g5_buffer indices;
-static kope_g5_texture float_render_target;
-static kope_g5_texture render_target; // intermediate target because D3D12 doesn't seem to like uav framebuffer access
-static compute_set set;
+static vertex_in_buffer     vertices;
+static kope_g5_buffer       indices;
+static kope_g5_texture      float_render_target;
+static kope_g5_texture      render_target; // intermediate target because D3D12 doesn't seem to like uav framebuffer access
+static compute_set          set;
 
 const static int width  = 800;
 const static int height = 600;

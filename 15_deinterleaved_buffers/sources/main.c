@@ -15,16 +15,16 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static vertex_in_buffer pos_vertices;
+static vertex_in_buffer     pos_vertices;
 static vertex_tex_in_buffer tex_vertices;
-static kope_g5_buffer indices;
-static kope_g5_texture texture;
-static kope_g5_buffer image_buffer;
-static kope_g5_buffer constants;
-static kope_g5_sampler sampler;
-static everything_set everything;
+static kope_g5_buffer       indices;
+static kope_g5_texture      texture;
+static kope_g5_buffer       image_buffer;
+static kope_g5_buffer       constants;
+static kope_g5_sampler      sampler;
+static everything_set       everything;
 
 static const int width  = 800;
 static const int height = 600;
@@ -145,32 +145,32 @@ static float vec4_dot(kinc_vector3_t a, kinc_vector3_t b) {
 }
 
 static kinc_matrix4x4_t matrix4x4_perspective_projection(float fovy, float aspect, float zn, float zf) {
-	float uh           = 1.0f / tanf(fovy / 2);
-	float uw           = uh / aspect;
-	kinc_matrix4x4_t m = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
+	float            uh = 1.0f / tanf(fovy / 2);
+	float            uw = uh / aspect;
+	kinc_matrix4x4_t m  = {uw, 0, 0, 0, 0, uh, 0, 0, 0, 0, (zf + zn) / (zn - zf), -1, 0, 0, 2 * zf * zn / (zn - zf), 0};
 	return m;
 }
 
 static kinc_matrix4x4_t matrix4x4_look_at(kinc_vector3_t eye, kinc_vector3_t at, kinc_vector3_t up) {
-	kinc_vector3_t zaxis = vec4_normalize(vec4_sub(at, eye));
-	kinc_vector3_t xaxis = vec4_normalize(vec4_cross(zaxis, up));
-	kinc_vector3_t yaxis = vec4_cross(xaxis, zaxis);
-	kinc_matrix4x4_t m   = {xaxis.x,
-	                        yaxis.x,
-	                        -zaxis.x,
-	                        0,
-	                        xaxis.y,
-	                        yaxis.y,
-	                        -zaxis.y,
-	                        0,
-	                        xaxis.z,
-	                        yaxis.z,
-	                        -zaxis.z,
-	                        0,
-	                        -vec4_dot(xaxis, eye),
-	                        -vec4_dot(yaxis, eye),
-	                        vec4_dot(zaxis, eye),
-	                        1};
+	kinc_vector3_t   zaxis = vec4_normalize(vec4_sub(at, eye));
+	kinc_vector3_t   xaxis = vec4_normalize(vec4_cross(zaxis, up));
+	kinc_vector3_t   yaxis = vec4_cross(xaxis, zaxis);
+	kinc_matrix4x4_t m     = {xaxis.x,
+	                          yaxis.x,
+	                          -zaxis.x,
+	                          0,
+	                          xaxis.y,
+	                          yaxis.y,
+	                          -zaxis.y,
+	                          0,
+	                          xaxis.z,
+	                          yaxis.z,
+	                          -zaxis.z,
+	                          0,
+	                          -vec4_dot(xaxis, eye),
+	                          -vec4_dot(yaxis, eye),
+	                          vec4_dot(zaxis, eye),
+	                          1};
 	return m;
 }
 
@@ -189,9 +189,9 @@ static size_t vertex_count = 0;
 
 static void update(void *data) {
 	kinc_matrix4x4_t projection = matrix4x4_perspective_projection(45.0f, 4.0f / 3.0f, 0.1f, 100.0f);
-	kinc_vector3_t v0           = {4, 3, 3};
-	kinc_vector3_t v1           = {0, 0, 0};
-	kinc_vector3_t v2           = {0, 1, 0};
+	kinc_vector3_t   v0         = {4, 3, 3};
+	kinc_vector3_t   v1         = {0, 0, 0};
+	kinc_vector3_t   v2         = {0, 1, 0};
 	kinc_matrix4x4_t view       = matrix4x4_look_at(v0, v1, v2);
 	kinc_matrix4x4_t model      = matrix4x4_identity();
 	kinc_matrix4x4_t mvp        = matrix4x4_identity();

@@ -11,14 +11,14 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static vertex_in_buffer vertices;
-static fs_vertex_in_buffer vertices_fs;
-static kope_g5_buffer indices;
-static kope_g5_texture target_depth;
-static kope_g5_sampler sampler;
-static fs_set set;
+static vertex_in_buffer     vertices;
+static fs_vertex_in_buffer  vertices_fs;
+static kope_g5_buffer       indices;
+static kope_g5_texture      target_depth;
+static kope_g5_sampler      sampler;
+static fs_set               set;
 
 static const int width  = 800;
 static const int height = 600;

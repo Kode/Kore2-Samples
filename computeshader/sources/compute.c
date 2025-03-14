@@ -15,12 +15,12 @@
 #define USE_BUFFER_IMAGE
 #define USE_CPU
 
-static kore_gpu_device device;
+static kore_gpu_device       device;
 static kore_gpu_command_list list;
-static vertex_in_buffer vertices;
-static kore_gpu_buffer indices;
-static kore_gpu_buffer constants;
-static kore_gpu_buffer compute_constants;
+static vertex_in_buffer      vertices;
+static kore_gpu_buffer       indices;
+static kore_gpu_buffer       constants;
+static kore_gpu_buffer       compute_constants;
 #ifdef USE_BUFFER_IMAGE
 #ifdef USE_CPU
 static kore_gpu_buffer buffer_source_texture;
@@ -30,8 +30,8 @@ static kore_gpu_buffer buffer_texture;
 static kore_gpu_texture texture;
 static kore_gpu_sampler sampler;
 #endif
-static everything_set everything;
-static compute_set compute;
+static everything_set  everything;
+static compute_set     compute;
 static kore_gpu_buffer image_buffer;
 
 static const int width  = 800;
@@ -41,7 +41,7 @@ static const uint64_t buffer_size = 256 * 256 * sizeof(kore_float4);
 
 void update(void *data) {
 	constants_type *constants_data = constants_type_buffer_lock(&constants, 0, 1);
-	kore_matrix3x3 matrix          = kore_matrix3x3_rotation_z(0);
+	kore_matrix3x3  matrix         = kore_matrix3x3_rotation_z(0);
 	constants_data->mvp            = matrix;
 	constants_type_buffer_unlock(&constants);
 

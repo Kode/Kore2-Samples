@@ -12,13 +12,13 @@
 #include "../../screenshot.h"
 #endif
 
-static kope_g5_device device;
+static kope_g5_device       device;
 static kope_g5_command_list list;
-static kope_g5_texture texture;
-static rayset_set rayset;
+static kope_g5_texture      texture;
+static rayset_set           rayset;
 
-static float quadVtx[]    = {-1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1};
-static float cubeVtx[]    = {-1, -1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, 1, 1, 1};
+static float    quadVtx[] = {-1, 0, -1, -1, 0, 1, 1, 0, 1, -1, 0, -1, 1, 0, -1, 1, 0, 1};
+static float    cubeVtx[] = {-1, -1, -1, 1, -1, -1, -1, 1, -1, 1, 1, -1, -1, -1, 1, 1, -1, 1, -1, 1, 1, 1, 1, 1};
 static uint16_t cubeIdx[] = {4, 6, 0, 2, 0, 6, 0, 1, 4, 5, 4, 1, 0, 2, 1, 3, 1, 2, 1, 3, 5, 7, 5, 3, 2, 6, 3, 7, 3, 6, 4, 5, 6, 7, 6, 5};
 
 static kope_g5_buffer quadVB;
@@ -77,7 +77,7 @@ static void update_transforms(void) {
 	}
 }
 
-static bool first     = true;
+static bool     first = true;
 static uint64_t frame = 0;
 
 void update(void *data) {
