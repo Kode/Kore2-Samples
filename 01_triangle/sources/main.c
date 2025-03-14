@@ -10,10 +10,10 @@
 #include "../../screenshot.h"
 #endif
 
-static kore_gpu_device device;
+static kore_gpu_device       device;
 static kore_gpu_command_list list;
-static vertex_in_buffer vertices;
-static kore_gpu_buffer indices;
+static vertex_in_buffer      vertices;
+static kore_gpu_buffer       indices;
 
 static const int width  = 800;
 static const int height = 600;
@@ -95,15 +95,18 @@ int kickstart(int argc, char **argv) {
 
 	kong_vertex_in_buffer_unlock(&vertices);
 
-	kore_gpu_buffer_parameters params;
-	params.size        = 3 * sizeof(uint16_t);
-	params.usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE;
+	kore_gpu_buffer_parameters params = {
+	    .size        = 3 * sizeof(uint16_t),
+	    .usage_flags = KORE_GPU_BUFFER_USAGE_INDEX | KORE_GPU_BUFFER_USAGE_CPU_WRITE,
+	};
 	kore_gpu_device_create_buffer(&device, &params, &indices);
 	{
 		uint16_t *i = (uint16_t *)kore_gpu_buffer_lock_all(&indices);
-		i[0]        = 0;
-		i[1]        = 1;
-		i[2]        = 2;
+
+		i[0] = 0;
+		i[1] = 1;
+		i[2] = 2;
+
 		kore_gpu_buffer_unlock(&indices);
 	}
 
