@@ -315,7 +315,7 @@ static void update(void *data) {
 	    .color_attachments_count = 1,
 	    .color_attachments =
 	        {
-	                            {
+	            {
 	                .load_op = KORE_GPU_LOAD_OP_CLEAR,
 	                .clear_value =
 	                    {
@@ -332,13 +332,14 @@ static void update(void *data) {
 	                        .format            = KORE_GPU_TEXTURE_FORMAT_BGRA8_UNORM,
 	                        .dimension         = KORE_GPU_TEXTURE_VIEW_DIMENSION_2D,
 	                    },
-	            }, },
+	            },
+	        },
 	    .depth_stencil_attachment =
 	        {
-	                            .texture           = &depth,
-	                            .depth_load_op     = KORE_GPU_LOAD_OP_CLEAR,
-	                            .depth_clear_value = 1.0f,
-	                            },
+	            .texture           = &depth,
+	            .depth_load_op     = KORE_GPU_LOAD_OP_CLEAR,
+	            .depth_clear_value = 1.0f,
+	        },
 	};
 	kore_gpu_command_list_begin_render_pass(&list, &parameters);
 
@@ -466,12 +467,12 @@ int kickstart(int argc, char **argv) {
 		    .constants = &constants,
 		    .pix_texture =
 		        {
-		                      .texture           = &texture,
-		                      .base_mip_level    = 0,
-		                      .mip_level_count   = 1,
-		                      .base_array_layer  = 0,
-		                      .array_layer_count = 1,
-		                      },
+		            .texture           = &texture,
+		            .base_mip_level    = 0,
+		            .mip_level_count   = 1,
+		            .base_array_layer  = 0,
+		            .array_layer_count = 1,
+		        },
 		    .pix_sampler = &sampler,
 		};
 		kong_create_everything_set(&device, &parameters, &everything);
